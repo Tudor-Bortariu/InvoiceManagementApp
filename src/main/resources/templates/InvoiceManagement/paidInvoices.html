@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Paid Invoices</title>
+    <!-- CSS only -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand">Choose action</a>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+            <a class="nav-item nav-link" th:href="@{/}">To Home Page</a>
+            <a class="nav-item nav-link" th:href="@{/invoiceManagement}">Manage All Invoices</a>
+            <a class="nav-item nav-link" th:href="@{/addInvoice}">Add new invoice</a>
+            <a class="nav-item nav-link" th:href="@{/logout}">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<h1 align="center">Paid Invoices</h1>
+
+<div class="container">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a th:href="@{/invoiceManagement}">View all</a></li>
+            <li class="breadcrumb-item active" aria-current="page">View Paid invoices</li>
+            <li class="breadcrumb-item"><a th:href="@{/invoiceManagement/unpaidInvoices}">View Unpaid invoices</a></li>
+        </ol>
+    </nav>
+</div>
+
+            <div class="container">
+                <table class="table table-hover">
+                    <thead class="thead-light">
+                    <tr>
+                        <th scope="col">Invoice Number</th>
+                        <th scope="col">Supplier Name</th>
+                        <th scope="col">Value</th>
+                        <th scope="col">Currency</th>
+                        <th scope="col">Due Date</th>
+                        <th scope="col">Introduction Date</th>
+                        <th scope="col">Payment Status</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                    </thead>
+                        <tbody>
+                            <tr th:each="invoice, iter:${paidInvoices}">
+                                <th scope="row" th:text="${invoice.invoiceNumber}"></th>
+                                <td th:text="${invoice.supplierName}"></td>
+                                <td th:text="${invoice.value}"></td>
+                                <td th:text="${invoice.currency}"></td>
+                                <td th:text="${invoice.dueDate}"></td>
+                                <td th:text="${invoice.introductionDate}"></td>
+                                <td th:text="${invoice.status}"></td>
+                                <td>
+                                    <a class="btn btn-outline-primary" th:href="@{/invoiceManagement/edit/{invoiceNumber}(invoiceNumber=${invoice.invoiceNumber})}">edit</a>
+                                    <a class="btn btn-outline-danger" th:href="@{/invoiceManagement/delete/{invoiceNumber}(invoiceNumber=${invoice.invoiceNumber})}">delete</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                </table>
+            </div>
+
+</body>
+</html>
