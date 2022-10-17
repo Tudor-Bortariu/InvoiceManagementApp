@@ -28,12 +28,16 @@ public class RegistrationController {
     }
 
     @PostMapping("")
-    public String sendRegistrationForm (Model model, @RequestParam String username, @RequestParam("password2") String password){
+    public String sendRegistrationForm (Model model,
+                                        @RequestParam String username,
+                                        @RequestParam("password2") String password,
+                                        @RequestParam String email){
 
         User user = new User();
         user.setId(UUID.randomUUID());
         user.setUsername(username);
         user.setPassword(securityConfig.passwordEncoder().encode(password));
+        user.setEmail(email);
 
         userRepository.saveAndFlush(user);
 
