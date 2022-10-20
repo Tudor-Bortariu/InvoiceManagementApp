@@ -15,6 +15,7 @@
             <div class="navbar-nav">
                 <a class="nav-item nav-link" th:href="@{/}">To Home Page</a>
                 <a class="nav-item nav-link" th:href="@{/invoiceManagement}">My Invoices</a>
+                <a class="nav-item nav-link" th:href="@{/supplierManagement}">My Suppliers</a>
                 <a class="nav-item nav-link" th:href="@{/logout}">Logout</a>
             </div>
         </div>
@@ -26,34 +27,40 @@
 <form method="post" action="/addInvoice">
     <div class="row">
         <div class="col">
-            <label for="invoiceNumber">Invoice Number: </label>
-            <input type="text" class="form-control" name="invoiceNumber" id="invoiceNumber" placeholder="Invoice Number">
+            <input type="text" class="form-control" name="invoiceNumber" id="invoiceNumber" required placeholder="Invoice Number">
         </div>
-        <div class="col">
-            <label for="supplierName">Supplier Name: </label>
-            <input type="text" class="form-control" name="supplierName" id="supplierName" placeholder="Supplier Name">
-        </div>
-        <div class="col">
-            <label for="value">Value: </label>
-            <input type="number" step="0.01" class="form-control" name="value" id="value" placeholder="Invoice Value">
+            <div class="col">
+                <select name="supplierName" id="supplier" required class="form-control">
+                    <option value="0">Select existing supplier</option>
+                    <option th:each="supplier : ${supplierList}" th:value="${supplier.supplierName}" th:text="${supplier.supplierName}"></option>
+                </select>
+            </div>
+            <div class="col">
+                <a class="btn btn-outline-primary" th:href="@{/supplierManagement/addSupplier}">or Add New Supplier</a>
+            </div>
+        <div class="row">
+            <div class="col">
+                <label for="value">Value: </label>
+                <input type="number" step="0.01" class="form-control" name="value" id="value" required placeholder="Invoice Value">
+            </div>
+            <div class="col">
+                <label for="currency">Currency: </label>
+                <select name="currency" id="currency" required class="form-control">
+                    <option value="RON">RON</option>
+                    <option value="EUR">EUR</option>
+                    <option value="USD">USD</option>
+                </select>
+            </div>
         </div>
     </div>
     <div class="row">
         <div class="col">
-            <label for="currency">Currency: </label>
-            <select name="currency" id="currency" class="form-control">
-            <option value="RON">RON</option>
-            <option value="EUR">EUR</option>
-            <option value="USD">USD</option>
-            </select>
-        </div>
-        <div class="col">
             <label for="dueDate">Select Due Date</label>
-            <input type="date" class="form-control" name="dueDate" id="dueDate" value="2022-10-01" min="2018-01-01" max="2024-12-31">
+            <input type="date" class="form-control" name="dueDate" id="dueDate" required value="2022-10-01" min="2018-01-01" max="2024-12-31">
         </div>
         <div class="col">
             <label for="status">Payment Status: </label>
-            <select name="paymentStatus" id="status" class="form-control">
+            <select name="paymentStatus" id="status" required class="form-control">
                 <option value="Paid">Paid</option>
                 <option value="Not paid">Not Paid</option>
             </select>

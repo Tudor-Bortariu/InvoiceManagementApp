@@ -24,6 +24,10 @@ public class User {
             cascade = CascadeType.ALL)
     private List<Invoice> invoices;
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY,
+            cascade = CascadeType.ALL)
+    private List<Supplier> suppliers;
+
     public User() {
     }
 

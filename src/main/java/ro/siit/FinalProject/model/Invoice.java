@@ -25,6 +25,9 @@ public class Invoice {
     @Column(name = "introduction_date", nullable = false)
     private LocalDate introductionDate;
 
+    @ManyToOne
+    private Supplier supplier;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -96,6 +99,14 @@ public class Invoice {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Supplier getSupplier() {
+        return supplier;
+    }
+
+    public void setSupplier(Supplier supplier) {
+        this.supplier = supplier;
     }
 
     public void setUser(User user) {

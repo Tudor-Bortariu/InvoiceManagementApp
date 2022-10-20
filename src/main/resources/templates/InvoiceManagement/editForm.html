@@ -17,8 +17,10 @@
             <input th:value="${invoice.invoiceNumber}" type="text" class="form-control" id="invoiceNumber" aria-describedby="number" name="invoiceNumber" readonly>
         </div>
         <div class="mb-3">
-            <label for="supplierName" class="form-label">Modify Supplier Name</label>
-            <input th:value="${invoice.supplierName}" type="text" class="form-control" id="supplierName" aria-describedby="supplierName" name="updatedSupplierName">
+            <select name="updatedSupplierName" required class="form-control">
+                <option value="0">Select existing supplier</option>
+                <option th:each="supplier : ${supplierList}" th:value="${supplier.supplierName}" th:text="${supplier.supplierName}"></option>
+            </select>
         </div>
         <div class="row">
             <div class="col">
