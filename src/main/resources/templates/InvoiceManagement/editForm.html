@@ -31,8 +31,9 @@
             <input th:value="${invoice.invoiceNumber}" type="text" class="form-control" id="invoiceNumber" aria-describedby="number" name="invoiceNumber" readonly>
         </div>
         <div class="mb-3">
-            <select name="updatedSupplierName" required class="form-control">
-                <option value="">Select existing supplier</option>
+            <label for="updatedSupplier">Update Supplier Name</label>
+            <select name="updatedSupplierName" required class="form-control" id="updatedSupplier">
+                <option th:value="${invoice.supplier.supplierName}" th:text="${invoice.supplier.supplierName}"></option>
                 <option th:each="supplier : ${supplierList}" th:value="${supplier.supplierName}" th:text="${supplier.supplierName}"></option>
             </select>
         </div>
@@ -43,10 +44,9 @@
             </div>
             <div class="col">
                 <label for="currency" class="form-label">Modify Invoice Currency </label>
-                <select th:value="${invoice.currency}" name="updatedCurrency" id="currency" class="form-control" aria-describedby="currency">
-                    <option value="RON">RON</option>
-                    <option value="EUR">EUR</option>
-                    <option value="USD">USD</option>
+                <select name="updatedCurrency" id="currency" class="form-control" aria-describedby="currency">
+                    <option th:value="${invoice.currency}" th:text="${invoice.currency}"></option>
+                    <option th:each="currency : ${currencyList}" th:value="${currency}" th:text="${currency}"></option>
                 </select>
             </div>
         </div>
@@ -56,9 +56,9 @@
         </div>
         <div>
             <label for="paymentStatus" class="form-label">Modify Payment Status</label>
-            <select th:value="${invoice.status}" name="updatedStatus" id="paymentStatus" class="form-control" aria-describedby="paymentStatus">
-                <option value="Paid">Paid</option>
-                <option value="Not paid">Not Paid</option>
+            <select name="updatedStatus" id="paymentStatus" class="form-control" aria-describedby="paymentStatus">
+                <option th:value="${invoice.status}" th:text="${invoice.status}"></option>
+                <option th:each="status : ${availableStatus}" th:value="${status}" th:text="${status}"></option>
             </select>
         </div>
         <div>

@@ -23,4 +23,7 @@ public interface JpaSupplierRepository extends JpaRepository<Supplier, UUID> {
 
     @Query(value = "SELECT s FROM Supplier s WHERE s.user = :user AND s.supplierName = :supplierName")
     Optional<Supplier> findSupplierByUserAndName(User user, @Param("supplierName") String supplierName);
+
+    @Query(value = "SELECT s FROM Supplier s WHERE s.user = :user AND s.supplierName != :supplierName")
+    List<Supplier> supplierListWithoutCurrentSupplier(User user, @Param("supplierName") String currentSupplierName);
 }

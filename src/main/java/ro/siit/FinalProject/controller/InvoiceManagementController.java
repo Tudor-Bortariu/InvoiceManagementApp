@@ -17,6 +17,8 @@ import ro.siit.FinalProject.service.IAuthenticationFacade;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -41,24 +43,6 @@ public class InvoiceManagementController {
         model.addAttribute("suppliers", supplierRepository.findAllSuppliersByUser(authenticatedUser));
 
         return "InvoiceManagement/invoiceManagement";
-    }
-
-    @GetMapping("/filterBySupplier")
-    public String filterInvoicesBySupplier(Model model,
-                                           @RequestParam String supplierName){
-
-        Authentication authentication = authenticationFacade.getAuthentication();
-        User authenticatedUser = ((CustomUserDetails)authentication.getPrincipal()).getUser();
-
-        if(supplierName.equals("viewAll")){
-            model.addAttribute("invoicesBySupplier", invoiceRepository.findAllInvoicesByUser(authenticatedUser));
-        }else{
-            model.addAttribute("invoicesBySupplier", invoiceRepository.findInvoiceBySupplierAndUser(authenticatedUser, supplierName));
-        }
-
-        model.addAttribute("suppliers", supplierRepository.findAllSuppliersByUser(authenticatedUser));
-
-        return "InvoiceManagement/filterBySupplier";
     }
 
     @GetMapping("/addInvoice")
@@ -103,13 +87,26 @@ public class InvoiceManagementController {
     @GetMapping("/edit/{invoiceNumber}")
     public String editInvoiceForm(Model model, @PathVariable String invoiceNumber) {
         Optional<Invoice> invoice = invoiceRepository.findInvoiceByNumber(invoiceNumber);
+        List<String> statusOptions = Arrays.asList("Paid", "Not paid");
+        List<String> currencyOptions = Arrays.asList("RON", "EUR", "USD");
 
         model.addAttribute("invoice", invoice.orElseThrow(ObjectNotFoundException::new));
 
         Authentication authentication = authenticationFacade.getAuthentication();
         User authenticatedUser = ((CustomUserDetails)authentication.getPrincipal()).getUser();
 
-        model.addAttribute("supplierList", supplierRepository.findAllSuppliersByUser(authenticatedUser));
+        model.addAttribute("supplierList",
+                supplierRepository.supplierListWithoutCurrentSupplier(authenticatedUser, invoice.get().getSupplier().getSupplierName()));
+
+        model.addAttribute("availableStatus", statusOptions
+                .stream()
+                .filter(status -> !status.equals(invoice.get().getStatus()))
+                .collect(Collectors.toList()));
+
+        model.addAttribute("currencyList", currencyOptions.stream()
+                .filter(currency -> !currency.equals(invoice.get().getCurrency()))
+                .collect(Collectors.toList()));
+
         model.addAttribute("minDate", LocalDate.now().minusYears(1));
         model.addAttribute("maxDate", LocalDate.now().plusYears(2));
 
