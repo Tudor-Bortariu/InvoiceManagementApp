@@ -9,6 +9,7 @@ import ro.siit.FinalProject.model.User;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface JpaSupplierRepository extends JpaRepository<Supplier, UUID> {
@@ -19,4 +20,7 @@ public interface JpaSupplierRepository extends JpaRepository<Supplier, UUID> {
     @Modifying
     @Query(value = "DELETE FROM Supplier s WHERE s.id=:id")
     void deleteBySupplierId(@Param("id") UUID id);
+
+    @Query(value = "SELECT s FROM Supplier s WHERE s.user = :user AND s.supplierName = :supplierName")
+    Optional<Supplier> findSupplierByUserAndName(User user, @Param("supplierName") String supplierName);
 }

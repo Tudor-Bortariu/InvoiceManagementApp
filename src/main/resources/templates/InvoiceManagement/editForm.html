@@ -9,8 +9,22 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
 </head>
 <body>
+
 <div class="container">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand">Choose action</a>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-item nav-link" th:href="@{/}">To Home Page</a>
+                <a class="nav-item nav-link" th:href="@{/invoiceManagement}">My Invoices</a>
+                <a class="nav-item nav-link" th:href="@{/supplierManagement}">My Suppliers</a>
+                <a class="nav-item nav-link" th:href="@{/logout}">Logout</a>
+            </div>
+        </div>
+    </nav>
+
     <h1 th:text="'Edit invoice ' + ${invoice.invoiceNumber}"></h1>
+
     <form method="post" th:action="@{/invoiceManagement/edit}">
         <div class="mb-3">
             <label for="invoiceNumber" class="form-label">Invoice Number</label>
@@ -18,7 +32,7 @@
         </div>
         <div class="mb-3">
             <select name="updatedSupplierName" required class="form-control">
-                <option value="0">Select existing supplier</option>
+                <option value="">Select existing supplier</option>
                 <option th:each="supplier : ${supplierList}" th:value="${supplier.supplierName}" th:text="${supplier.supplierName}"></option>
             </select>
         </div>
@@ -38,7 +52,7 @@
         </div>
         <div>
             <label for="dueDate" class="form-label">Modify Due Date</label>
-            <input th:value="${invoice.dueDate}" type="date" class="form-control" name="updatedDueDate" id="dueDate" min="2018-01-01" max="2024-12-31">
+            <input th:value="${invoice.dueDate}" type="date" class="form-control" name="updatedDueDate" id="dueDate" th:min="${minDate}" th:max="${maxDate}">
         </div>
         <div>
             <label for="paymentStatus" class="form-label">Modify Payment Status</label>

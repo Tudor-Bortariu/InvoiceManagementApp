@@ -29,4 +29,7 @@ public interface JpaInvoiceRepository extends JpaRepository<Invoice, UUID> {
 
     @Query(value = "SELECT i FROM Invoice i WHERE i.user = :user AND i.status = :status")
     List<Invoice> findInvoicesByStatus(User user, String status);
+
+    @Query(value = "SELECT i FROM Invoice i WHERE i.user = :user AND i.supplier.supplierName = :supplierName")
+    List<Invoice> findInvoiceBySupplierAndUser(User user, @Param("supplierName") String supplierName);
 }

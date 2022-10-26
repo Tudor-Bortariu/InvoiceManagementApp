@@ -7,7 +7,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 import ro.siit.FinalProject.model.CustomUserDetails;
-import ro.siit.FinalProject.model.Invoice;
 import ro.siit.FinalProject.model.Supplier;
 import ro.siit.FinalProject.model.User;
 import ro.siit.FinalProject.repository.JpaSupplierRepository;
@@ -41,12 +40,12 @@ public class SupplierManagementController {
         return "SupplierManagement/addSupplier";
     }
 
-    @PostMapping("/addSupplier")
+    @PostMapping("supplierManagement/addSupplier")
     public RedirectView addSupplier(Model model,
                                     @RequestParam String supplierName,
                                     @RequestParam String phoneNumber) {
 
-        Supplier addedSupplier = new Supplier(UUID.randomUUID(), supplierName.toUpperCase(), phoneNumber);
+        Supplier addedSupplier = new Supplier(UUID.randomUUID(), supplierName, phoneNumber);
 
         Authentication authentication = authenticationFacade.getAuthentication();
 

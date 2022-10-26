@@ -37,7 +37,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((authz) -> {
                     try {
                         authz
-                                .antMatchers("/invoiceManagement/**", "/addInvoice/**", "/addSupplier/**").authenticated()
+                                .antMatchers("/invoiceManagement/**", "/addInvoice/**", "supplierManagement/**").authenticated()
                                 .anyRequest().permitAll()
                                 .and()
                                 .formLogin()

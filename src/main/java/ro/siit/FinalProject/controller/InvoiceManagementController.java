@@ -6,8 +6,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
+import ro.siit.FinalProject.exception.ObjectNotFoundException;
 import ro.siit.FinalProject.model.CustomUserDetails;
 import ro.siit.FinalProject.model.Invoice;
+import ro.siit.FinalProject.model.Supplier;
 import ro.siit.FinalProject.model.User;
 import ro.siit.FinalProject.repository.JpaInvoiceRepository;
 import ro.siit.FinalProject.repository.JpaSupplierRepository;
@@ -36,8 +38,27 @@ public class InvoiceManagementController {
         User authenticatedUser = ((CustomUserDetails)authentication.getPrincipal()).getUser();
 
         model.addAttribute("invoices", invoiceRepository.findAllInvoicesByUser(authenticatedUser));
+        model.addAttribute("suppliers", supplierRepository.findAllSuppliersByUser(authenticatedUser));
 
         return "InvoiceManagement/invoiceManagement";
+    }
+
+    @GetMapping("/filterBySupplier")
+    public String filterInvoicesBySupplier(Model model,
+                                           @RequestParam String supplierName){
+
+        Authentication authentication = authenticationFacade.getAuthentication();
+        User authenticatedUser = ((CustomUserDetails)authentication.getPrincipal()).getUser();
+
+        if(supplierName.equals("viewAll")){
+            model.addAttribute("invoicesBySupplier", invoiceRepository.findAllInvoicesByUser(authenticatedUser));
+        }else{
+            model.addAttribute("invoicesBySupplier", invoiceRepository.findInvoiceBySupplierAndUser(authenticatedUser, supplierName));
+        }
+
+        model.addAttribute("suppliers", supplierRepository.findAllSuppliersByUser(authenticatedUser));
+
+        return "InvoiceManagement/filterBySupplier";
     }
 
     @GetMapping("/addInvoice")
@@ -46,11 +67,14 @@ public class InvoiceManagementController {
         User authenticatedUser = ((CustomUserDetails)authentication.getPrincipal()).getUser();
 
         model.addAttribute("supplierList", supplierRepository.findAllSuppliersByUser(authenticatedUser));
+        model.addAttribute("currentDate", LocalDate.now());
+        model.addAttribute("minDate", LocalDate.now().minusYears(1));
+        model.addAttribute("maxDate", LocalDate.now().plusYears(2));
 
         return "InvoiceManagement/addInvoice";
     }
 
-    @PostMapping("/addInvoice")
+    @PostMapping("invoiceManagement/addInvoice")
     public RedirectView addInvoice(Model model,
                                    @RequestParam String invoiceNumber,
                                    @RequestParam String supplierName,
@@ -59,9 +83,10 @@ public class InvoiceManagementController {
                                    @RequestParam String dueDate,
                                    @RequestParam String paymentStatus) {
 
-        Invoice addedInvoice = new Invoice(invoiceNumber, supplierName, value, currency, dueDate, paymentStatus);
-
         Authentication authentication = authenticationFacade.getAuthentication();
+        Optional<Supplier> supplier = supplierRepository.findSupplierByUserAndName(((CustomUserDetails)authentication.getPrincipal()).getUser(), supplierName);
+
+        Invoice addedInvoice = new Invoice(invoiceNumber, value, currency, dueDate, paymentStatus, supplier.orElseThrow(ObjectNotFoundException::new));
 
         addedInvoice.setUser(((CustomUserDetails)authentication.getPrincipal()).getUser());
         invoiceRepository.saveAndFlush(addedInvoice);
@@ -78,12 +103,15 @@ public class InvoiceManagementController {
     @GetMapping("/edit/{invoiceNumber}")
     public String editInvoiceForm(Model model, @PathVariable String invoiceNumber) {
         Optional<Invoice> invoice = invoiceRepository.findInvoiceByNumber(invoiceNumber);
-        model.addAttribute("invoice", invoice.get());
+
+        model.addAttribute("invoice", invoice.orElseThrow(ObjectNotFoundException::new));
 
         Authentication authentication = authenticationFacade.getAuthentication();
         User authenticatedUser = ((CustomUserDetails)authentication.getPrincipal()).getUser();
 
         model.addAttribute("supplierList", supplierRepository.findAllSuppliersByUser(authenticatedUser));
+        model.addAttribute("minDate", LocalDate.now().minusYears(1));
+        model.addAttribute("maxDate", LocalDate.now().plusYears(2));
 
         return "InvoiceManagement/editForm";
     }
@@ -97,9 +125,13 @@ public class InvoiceManagementController {
                                    @RequestParam String updatedDueDate,
                                    @RequestParam String updatedStatus) {
 
-        Optional<Invoice> invoice = invoiceRepository.findInvoiceByNumber(invoiceNumber);
+        Authentication authentication = authenticationFacade.getAuthentication();
+        User authenticatedUser = ((CustomUserDetails)authentication.getPrincipal()).getUser();
 
-        invoice.get().setSupplierName(updatedSupplierName);
+        Optional<Invoice> invoice = invoiceRepository.findInvoiceByNumber(invoiceNumber);
+        Optional<Supplier> updatedSupplier = supplierRepository.findSupplierByUserAndName(authenticatedUser, updatedSupplierName);
+
+        invoice.orElseThrow(ObjectNotFoundException::new).setSupplier(updatedSupplier.orElseThrow(ObjectNotFoundException::new));
         invoice.get().setValue(updatedValue);
         invoice.get().setCurrency(updatedCurrency);
         invoice.get().setDueDate(updatedDueDate);

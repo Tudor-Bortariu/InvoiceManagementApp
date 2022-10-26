@@ -24,14 +24,14 @@
     </div>
 </nav>
 
-<h1 align="center">Unpaid Invoices</h1>
+<h1 align="center">Invoices due in 7 days</h1>
 
 <div class="container">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a th:href="@{/invoiceManagement}">View all</a></li>
             <li class="breadcrumb-item"><a th:href="@{/invoiceManagement/paidInvoices}">View Paid invoices</a></li>
-            <li class="breadcrumb-item active" aria-current="page">View Unpaid invoices</li>
+            <li class="breadcrumb-item active"><a th:href="@{/invoiceManagement/unpaidInvoices}">View all Unpaid invoices</a></li>
             <li class="breadcrumb-item"><a th:href="@{/invoiceManagement/dueIn7Days}">Due in 7 Days</a></li>
             <li class="breadcrumb-item"><a th:href="@{/invoiceManagement/dueIn30Days}">Due in 30 Days</a></li>
         </ol>
@@ -53,7 +53,7 @@
                     </tr>
                     </thead>
                         <tbody>
-                            <tr th:each="invoice, iter:${unpaidInvoices}">
+                            <tr th:each="invoice, iter:${invoicesBySupplier}">
                                 <th scope="row" th:text="${invoice.invoiceNumber}"></th>
                                 <td th:text="${invoice.supplier?.supplierName}"></td>
                                 <td th:text="${invoice.value}"></td>

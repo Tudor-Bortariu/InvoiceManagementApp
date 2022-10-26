@@ -55,7 +55,7 @@
                         <tbody>
                             <tr th:each="invoice, iter:${dueIn30Days}">
                                 <th scope="row" th:text="${invoice.invoiceNumber}"></th>
-                                <td th:text="${invoice.supplierName}"></td>
+                                <td th:text="${invoice.supplier?.supplierName}"></td>
                                 <td th:text="${invoice.value}"></td>
                                 <td th:text="${invoice.currency}"></td>
                                 <td th:text="${invoice.dueDate}"></td>

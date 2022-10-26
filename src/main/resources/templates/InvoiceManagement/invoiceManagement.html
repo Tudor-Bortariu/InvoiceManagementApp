@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -37,6 +37,23 @@
     </nav>
 </div>
 
+<div class="container">
+<form method="get" action="invoiceManagement/filterBySupplier">
+        <div class="row">
+        <div class="col">
+            <select name="supplierName" id="supplier" required class="form-control">
+                <option value="">Filter by supplier</option>
+                <option value="viewAll">View All</option>
+                <option th:each="supplier : ${suppliers}" th:value="${supplier.supplierName}" th:text="${supplier.supplierName}"></option>
+            </select>
+        </div>
+    <div class="col">
+        <input type="submit" value="Filter table" class="btn btn-outline-primary">
+    </div>
+        </div>
+    </form>
+</div>
+
             <div class="container">
                 <table class="table table-hover">
                     <thead class="thead-light">
@@ -54,7 +71,7 @@
                         <tbody>
                             <tr th:each="invoice, iter:${invoices}">
                                 <th scope="row" th:text="${invoice.invoiceNumber}"></th>
-                                <td th:text="${invoice.supplierName}"></td>
+                                <td th:text="${invoice.supplier?.supplierName}"></td>
                                 <td th:text="${invoice.value}"></td>
                                 <td th:text="${invoice.currency}"></td>
                                 <td th:text="${invoice.dueDate}"></td>

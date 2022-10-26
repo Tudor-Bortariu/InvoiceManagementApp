@@ -12,7 +12,7 @@ public class Supplier {
     @Column(name = "supplier_id")
     private UUID id;
 
-    @Column(nullable = false, name = "supplier_name")
+    @Column(nullable = false, name = "supplier_name", unique = true)
     private String supplierName;
 
     @Column(name = "phone_number")
@@ -28,7 +28,7 @@ public class Supplier {
 
     public Supplier(UUID id, String supplierName, String phoneNumber) {
         this.id = id;
-        this.supplierName = supplierName;
+        this.supplierName = supplierName.toUpperCase();
         this.phoneNumber = phoneNumber;
     }
 
@@ -49,7 +49,7 @@ public class Supplier {
     }
 
     public void setSupplierName(String supplierName) {
-        this.supplierName = supplierName;
+        this.supplierName = supplierName.toUpperCase();
     }
 
     public String getPhoneNumber() {

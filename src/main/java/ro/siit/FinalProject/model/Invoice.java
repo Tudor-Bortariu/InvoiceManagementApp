@@ -10,9 +10,6 @@ public class Invoice {
     @Column(name = "invoice_number", nullable = false)
     private String invoiceNumber;
 
-    @Column(name = "supplier_name", nullable = false)
-    private String supplierName;
-
     @Column(nullable = false)
     private Double value;
 
@@ -35,14 +32,14 @@ public class Invoice {
     @Column(name = "status", nullable = false)
     private String status;
 
-    public Invoice(String invoiceNumber, String supplierName, Double value, String currency, String dueDate, String status) {
+    public Invoice(String invoiceNumber, Double value, String currency, String dueDate, String status, Supplier supplier) {
         this.invoiceNumber = invoiceNumber;
-        this.supplierName = supplierName;
         this.value = value;
         this.currency = currency;
         this.dueDate = dueDate;
         this.introductionDate = LocalDate.now();
         this.status = status;
+        this.supplier = supplier;
     }
 
     public Invoice (){
@@ -51,14 +48,6 @@ public class Invoice {
 
     public String getInvoiceNumber() {
         return invoiceNumber;
-    }
-
-    public String getSupplierName() {
-        return supplierName;
-    }
-
-    public void setSupplierName(String supplierName) {
-        this.supplierName = supplierName;
     }
 
     public Double getValue() {
