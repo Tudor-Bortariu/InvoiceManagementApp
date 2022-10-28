@@ -18,6 +18,8 @@ public class Supplier {
     @Column(name = "phone_number")
     private String phoneNumber;
 
+    private String county;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -26,10 +28,11 @@ public class Supplier {
             cascade = CascadeType.ALL)
     private List<Invoice> invoices;
 
-    public Supplier(UUID id, String supplierName, String phoneNumber) {
+    public Supplier(UUID id, String supplierName, String phoneNumber, String county) {
         this.id = id;
         this.supplierName = supplierName.toUpperCase();
         this.phoneNumber = phoneNumber;
+        this.county = county.toUpperCase();
     }
 
     public Supplier(){
@@ -66,5 +69,13 @@ public class Supplier {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public String getCounty() {
+        return county;
+    }
+
+    public void setCounty(String county) {
+        this.county = county.toUpperCase();
     }
 }

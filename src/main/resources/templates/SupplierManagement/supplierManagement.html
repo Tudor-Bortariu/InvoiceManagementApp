@@ -8,6 +8,10 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <!-- JavaScript Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel=”stylesheet” href=”https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css”/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/CssStyle/cssStyle.css}">
 </head>
 <body>
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -15,7 +19,6 @@
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
         <a class="nav-item nav-link" th:href="@{/}">To Home Page</a>
-        <a class="nav-item nav-link" th:href="@{/supplierManagement/addSupplier}">Add new supplier</a>
         <a class="nav-item nav-link" th:href="@{/invoiceManagement}">My Invoices</a>
         <a class="nav-item nav-link" th:href="@{/invoiceManagement/addInvoice}">Add new invoice</a>
         <a class="nav-item nav-link" th:href="@{/logout}">Logout</a>
@@ -26,11 +29,17 @@
   <h1 align="center">Your Suppliers</h1>
 
   <div class="container">
-    <table class="table table-hover">
+    <a class="btn btn-outline-primary" th:href="@{/supplierManagement/addSupplier}">Add new Supplier</a>
+  </div>
+  <br>
+
+  <div class="container">
+    <table class="table table-hover" id="supplierTable">
       <thead class="thead-light">
       <tr>
         <th scope="col">Supplier Name</th>
         <th scope="col">Phone Number</th>
+        <th scope="col">County</th>
         <th scope="col">Action</th>
       </tr>
       </thead>
@@ -38,9 +47,10 @@
       <tr th:each="supplier, iter:${suppliers}">
         <th scope="row" th:text="${supplier.supplierName}"></th>
         <td th:text="${supplier.phoneNumber}"></td>
+        <td th:text="${supplier.county}"></td>
         <td>
-          <a class="btn btn-outline-danger" th:href="@{/supplierManagement/delete/{id}(id=${supplier.id})}">delete</a>
-          <a class="btn btn-outline-primary" th:href="@{/supplierManagement/edit/{id}(id=${supplier.id})}">edit</a>
+          <a class="btn btn-outline-info" th:href="@{/supplierManagement/edit/{id}(id=${supplier.id})}"><i class="bi bi-pencil-fill"></i></a>
+          <a class="btn btn-outline-danger" th:href="@{/supplierManagement/delete/{id}(id=${supplier.id})}"><i class="bi bi-trash"></i></a>
         </td>
       </tr>
       </tbody>

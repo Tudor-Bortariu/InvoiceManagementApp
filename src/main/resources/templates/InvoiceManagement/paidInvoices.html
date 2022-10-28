@@ -9,6 +9,10 @@
     <!-- JavaScript Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
     <script type="text/javascript" th:src="@{/JavaScript/javaScript.js}"></script>
+    <link rel="stylesheet" th:href="@{/CssStyle/cssStyle.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel=”stylesheet” href=”https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css”/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css">
 </head>
 <body>
 
@@ -28,6 +32,11 @@
 <h1 align="center">Paid Invoices</h1>
 
 <div class="container">
+    <a class="btn btn-outline-primary" th:href="@{/invoiceManagement/addInvoice}">Add new Invoice</a>
+</div>
+<br>
+
+<div class="container">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a th:href="@{/invoiceManagement}">View all</a></li>
@@ -42,11 +51,13 @@
             <div class="input-group-prepend">
                 <span class="input-group-text" id="">Filter by Supplier</span>
             </div>
-            <input type="text" class="form-control" id="supplierInput" onkeyup="myFunction()" placeholder="Write Supplier Name..">
+            <input type="text" class="form-control" id="supplierInput" onkeyup="filterBySupplierName()" placeholder="Write Supplier Name..">
         </div>
     </div>
 
-            <div class="container">
+<br>
+
+            <div class="managementTable">
                 <table class="table table-hover" id="invoiceTable">
                     <thead class="thead-light">
                     <tr>
@@ -58,6 +69,7 @@
                         <th scope="col">Introduction Date</th>
                         <th scope="col">Payment Status</th>
                         <th scope="col">Action</th>
+                        <th scope="col">Mark as Unpaid</th>
                     </tr>
                     </thead>
                         <tbody>
@@ -70,8 +82,11 @@
                                 <td th:text="${invoice.introductionDate}"></td>
                                 <td th:text="${invoice.status}"></td>
                                 <td>
-                                    <a class="btn btn-outline-primary" th:href="@{/invoiceManagement/edit/{invoiceNumber}(invoiceNumber=${invoice.invoiceNumber})}">edit</a>
-                                    <a class="btn btn-outline-danger" th:href="@{/invoiceManagement/delete/{invoiceNumber}(invoiceNumber=${invoice.invoiceNumber})}">delete</a>
+                                    <a class="btn btn-outline-info" th:href="@{/invoiceManagement/edit/{invoiceNumber}(invoiceNumber=${invoice.invoiceNumber})}"><i class="bi bi-pencil-fill"></i></a>
+                                    <a class="btn btn-outline-danger" th:href="@{/invoiceManagement/delete/{invoiceNumber}(invoiceNumber=${invoice.invoiceNumber})}"><i class="bi bi-trash"></i></a>
+                                </td>
+                                <td>
+                                    <a id="markAsUnpaidButton" class="btn btn-outline-info" th:unless="${invoice.status == 'Not paid'}" th:href="@{/invoiceManagement/markAsUnpaid/{invoiceNumber}(invoiceNumber=${invoice.invoiceNumber})}">Mark as Unpaid</a>
                                 </td>
                             </tr>
                         </tbody>

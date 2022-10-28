@@ -1,4 +1,4 @@
-function myFunction() {
+function filterBySupplierName() {
   var input, filter, table, tr, td, i, txtValue;
   input = document.getElementById("supplierInput");
   filter = input.value.toUpperCase();

@@ -68,7 +68,9 @@ public class InvoiceManagementController {
                                    @RequestParam String paymentStatus) {
 
         Authentication authentication = authenticationFacade.getAuthentication();
-        Optional<Supplier> supplier = supplierRepository.findSupplierByUserAndName(((CustomUserDetails)authentication.getPrincipal()).getUser(), supplierName);
+        User authenticatedUser = ((CustomUserDetails)authentication.getPrincipal()).getUser();
+
+        Optional<Supplier> supplier = supplierRepository.findSupplierByUserAndName(authenticatedUser, supplierName);
 
         Invoice addedInvoice = new Invoice(invoiceNumber, value, currency, dueDate, paymentStatus, supplier.orElseThrow(ObjectNotFoundException::new));
 
@@ -98,14 +100,9 @@ public class InvoiceManagementController {
         model.addAttribute("supplierList",
                 supplierRepository.supplierListWithoutCurrentSupplier(authenticatedUser, invoice.get().getSupplier().getSupplierName()));
 
-        model.addAttribute("availableStatus", statusOptions
-                .stream()
-                .filter(status -> !status.equals(invoice.get().getStatus()))
-                .collect(Collectors.toList()));
+        model.addAttribute("availableStatus", getRemainedInvoiceStatusOptions(invoice.get(), statusOptions));
 
-        model.addAttribute("currencyList", currencyOptions.stream()
-                .filter(currency -> !currency.equals(invoice.get().getCurrency()))
-                .collect(Collectors.toList()));
+        model.addAttribute("currencyList", getRemainedInvoiceCurrencyOptions(invoice.get(), currencyOptions));
 
         model.addAttribute("minDate", LocalDate.now().minusYears(1));
         model.addAttribute("maxDate", LocalDate.now().plusYears(2));
@@ -134,7 +131,31 @@ public class InvoiceManagementController {
         invoice.get().setDueDate(updatedDueDate);
         invoice.get().setStatus(updatedStatus);
 
-        invoiceRepository.save(invoice.get());
+        invoiceRepository.saveAndFlush(invoice.get());
+
+        return new RedirectView("/invoiceManagement");
+    }
+
+    @GetMapping("/markAsPaid/{invoiceNumber}")
+    public RedirectView markInvoiceAsPaid(Model model, @PathVariable String invoiceNumber){
+        Optional<Invoice> invoice = invoiceRepository.findInvoiceByNumber(invoiceNumber);
+
+        if(invoice.orElseThrow(ObjectNotFoundException::new).getStatus().equals("Not paid")) {
+            invoice.get().setStatus("Paid");
+            invoiceRepository.saveAndFlush(invoice.get());
+        }
+
+        return new RedirectView("/invoiceManagement");
+    }
+
+    @GetMapping("/markAsUnpaid/{invoiceNumber}")
+    public RedirectView markInvoiceAsUnpaid(Model model, @PathVariable String invoiceNumber){
+        Optional<Invoice> invoice = invoiceRepository.findInvoiceByNumber(invoiceNumber);
+
+        if(invoice.orElseThrow(ObjectNotFoundException::new).getStatus().equals("Paid")) {
+            invoice.get().setStatus("Not paid");
+            invoiceRepository.saveAndFlush(invoice.get());
+        }
 
         return new RedirectView("/invoiceManagement");
     }
@@ -164,11 +185,8 @@ public class InvoiceManagementController {
         Authentication authentication = authenticationFacade.getAuthentication();
         User authenticatedUser = ((CustomUserDetails)authentication.getPrincipal()).getUser();
 
-        model.addAttribute("dueIn7Days", invoiceRepository.findInvoicesByStatus(authenticatedUser, "Not paid")
-                .stream()
-                .filter(invoice -> (ChronoUnit.DAYS.between(LocalDate.now(), LocalDate.parse(invoice.getDueDate())) <= 7)
-                        && (ChronoUnit.DAYS.between(LocalDate.now(), LocalDate.parse(invoice.getDueDate())) >= 0))
-                .collect(Collectors.toList()));
+        model.addAttribute("dueIn7Days",
+                getDueInvoices(invoiceRepository.findInvoicesByStatus(authenticatedUser, "Not paid"), 7));
 
         return "InvoiceManagement/dueIn7Days";
     }
@@ -178,12 +196,31 @@ public class InvoiceManagementController {
         Authentication authentication = authenticationFacade.getAuthentication();
         User authenticatedUser = ((CustomUserDetails)authentication.getPrincipal()).getUser();
 
-        model.addAttribute("dueIn30Days", invoiceRepository.findInvoicesByStatus(authenticatedUser, "Not paid")
-                .stream()
-                .filter(invoice -> (ChronoUnit.DAYS.between(LocalDate.now(), LocalDate.parse(invoice.getDueDate())) <= 30)
-                        && (ChronoUnit.DAYS.between(LocalDate.now(), LocalDate.parse(invoice.getDueDate())) >= 0))
-                .collect(Collectors.toList()));
+        model.addAttribute("dueIn30Days",
+                getDueInvoices(invoiceRepository.findInvoicesByStatus(authenticatedUser, "Not paid"), 30));
 
         return "InvoiceManagement/dueIn30Days";
+    }
+
+    private List<Invoice> getDueInvoices (List<Invoice> allUnpaidInvoicesByUser, Integer numberOfDaysUntilDue){
+        return allUnpaidInvoicesByUser
+                .stream()
+                .filter(invoice -> (ChronoUnit.DAYS.between(LocalDate.now(), LocalDate.parse(invoice.getDueDate())) <= numberOfDaysUntilDue)
+                        && (ChronoUnit.DAYS.between(LocalDate.now(), LocalDate.parse(invoice.getDueDate())) >= 0))
+                .collect(Collectors.toList());
+    }
+
+    private List<String> getRemainedInvoiceStatusOptions(Invoice invoice, List<String> allStatusOptions) {
+        return allStatusOptions
+                .stream()
+                .filter(status -> !status.equals(invoice.getStatus()))
+                .collect(Collectors.toList());
+    }
+
+    private List<String> getRemainedInvoiceCurrencyOptions(Invoice invoice, List<String> allCurrencyOptions) {
+        return allCurrencyOptions
+                .stream()
+                .filter(status -> !status.equals(invoice.getCurrency()))
+                .collect(Collectors.toList());
     }
 }

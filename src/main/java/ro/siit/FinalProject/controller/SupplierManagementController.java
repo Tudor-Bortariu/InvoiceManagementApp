@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
+import ro.siit.FinalProject.exception.ObjectNotFoundException;
 import ro.siit.FinalProject.model.CustomUserDetails;
 import ro.siit.FinalProject.model.Supplier;
 import ro.siit.FinalProject.model.User;
@@ -43,16 +44,17 @@ public class SupplierManagementController {
     @PostMapping("supplierManagement/addSupplier")
     public RedirectView addSupplier(Model model,
                                     @RequestParam String supplierName,
-                                    @RequestParam String phoneNumber) {
+                                    @RequestParam String phoneNumber,
+                                    @RequestParam String county) {
 
-        Supplier addedSupplier = new Supplier(UUID.randomUUID(), supplierName, phoneNumber);
+        Supplier addedSupplier = new Supplier(UUID.randomUUID(), supplierName, phoneNumber, county);
 
         Authentication authentication = authenticationFacade.getAuthentication();
 
         addedSupplier.setUser(((CustomUserDetails)authentication.getPrincipal()).getUser());
         supplierRepository.saveAndFlush(addedSupplier);
 
-        return new RedirectView("/invoiceManagement");
+        return new RedirectView("/supplierManagement");
     }
 
     @GetMapping("/delete/{id}")
@@ -64,7 +66,7 @@ public class SupplierManagementController {
     @GetMapping("/edit/{id}")
     public String editSupplierForm(Model model, @PathVariable UUID id) {
         Optional<Supplier> supplier = supplierRepository.findById(id);
-        model.addAttribute("supplier", supplier.get());
+        model.addAttribute("supplier", supplier.orElseThrow(ObjectNotFoundException::new));
 
         return "SupplierManagement/editForm";
     }
@@ -73,14 +75,16 @@ public class SupplierManagementController {
     public RedirectView editInvoice(Model model,
                                     @RequestParam UUID supplierId,
                                     @RequestParam String updatedSupplierName,
-                                    @RequestParam String updatedPhoneNumber) {
+                                    @RequestParam String updatedPhoneNumber,
+                                    @RequestParam String updatedCounty) {
 
         Optional<Supplier> supplier = supplierRepository.findById(supplierId);
 
-        supplier.get().setSupplierName(updatedSupplierName);
+        supplier.orElseThrow(ObjectNotFoundException::new).setSupplierName(updatedSupplierName);
         supplier.get().setPhoneNumber(updatedPhoneNumber);
+        supplier.get().setCounty(updatedCounty);
 
-        supplierRepository.save(supplier.get());
+        supplierRepository.saveAndFlush(supplier.get());
 
         return new RedirectView("/supplierManagement");
     }
