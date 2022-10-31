@@ -7,7 +7,9 @@
     <!-- CSS only -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <!-- JavaScript Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <link th:href="@{/CssStyle/cssStyle.css}" rel="stylesheet" />
     <script type="text/javascript" th:src="@{/JavaScript/javaScript.js}"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -16,36 +18,46 @@
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand">Choose action</a>
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav">
-            <a class="nav-item nav-link" th:href="@{/}">To Home Page</a>
-            <a class="nav-item nav-link" th:href="@{/invoiceManagement}">Manage All Invoices</a>
-            <a class="nav-item nav-link" th:href="@{/invoiceManagement/addInvoice}">Add new invoice</a>
-            <a class="nav-item nav-link" th:href="@{/supplierManagement}">My Suppliers</a>
-            <a class="nav-item nav-link" th:href="@{/logout}">Logout</a>
+<div class="pos-f-t">
+    <div class="collapse" id="navbarToggleExternalContent">
+        <div class="bg-dark p-4">
+
+            <div class="topnav">
+                <a class="nav-item nav-link" th:href="@{/}">To Home Page</a>
+                <a class="nav-item nav-link" th:href="@{/invoiceManagement}">Manage All Invoices</a>
+                <a class="nav-item nav-link" th:href="@{/invoiceManagement/addInvoice}">Add new invoice</a>
+                <a class="nav-item nav-link" th:href="@{/supplierManagement}">My Suppliers</a>
+                <a class="nav-item nav-link" th:href="@{/logout}" sec:authorize="isAuthenticated()">Logout</a>
+            </div>
+
         </div>
     </div>
-</nav>
+    <nav class="navbar navbar-dark bg-dark">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </nav>
+</div>
 
 <h1 align="center">Unpaid Invoices</h1>
 
 <div class="container">
-    <a class="btn btn-outline-primary" th:href="@{/invoiceManagement/addInvoice}">Add new Invoice</a>
-</div>
-<br>
-
-<div class="container">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a th:href="@{/invoiceManagement}">View all</a></li>
-            <li class="breadcrumb-item"><a th:href="@{/invoiceManagement/paidInvoices}">View Paid invoices</a></li>
-            <li class="breadcrumb-item active" aria-current="page">View Unpaid invoices</li>
-            <li class="breadcrumb-item"><a th:href="@{/invoiceManagement/dueIn7Days}">Due in 7 Days</a></li>
-            <li class="breadcrumb-item"><a th:href="@{/invoiceManagement/dueIn30Days}">Due in 30 Days</a></li>
-        </ol>
-    </nav>
+    <div class="row">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a th:href="@{/invoiceManagement}">View all</a></li>
+                    <li class="breadcrumb-item"><a th:href="@{/invoiceManagement/paidInvoices}">View Paid invoices</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">View Unpaid invoices</li>
+                    <li class="breadcrumb-item"><a th:href="@{/invoiceManagement/dueIn7Days}">Due in 7 Days</a></li>
+                    <li class="breadcrumb-item"><a th:href="@{/invoiceManagement/dueIn30Days}">Due in 30 Days</a></li>
+                </ol>
+            </nav>
+        </div>
+        <div class="col-md-auto">
+            <a class="btn btn-success" th:href="@{/invoiceManagement/addInvoice}" style="background-color: #04AA6D;">Add new Invoice</a>
+        </div>
+    </div>
 </div>
 
     <div class="container">
@@ -57,7 +69,9 @@
         </div>
     </div>
 
-<br>
+<div class="container">
+    <p id="colorExplanation"><span id="colorSample">A</span> - Invoice is Not paid and Overdue.</p>
+</div>
 
             <div class="managementTable">
                 <table class="table table-hover" id="invoiceTable">
@@ -80,7 +94,8 @@
                                 <td th:text="${invoice.supplier?.supplierName}"></td>
                                 <td th:text="${invoice.value}"></td>
                                 <td th:text="${invoice.currency}"></td>
-                                <td th:text="${invoice.dueDate}"></td>
+                                <td th:text="${invoice.dueDate}" style="background-color: #FFB6C1;" th:if="${invoice.dueDate < currentDate && invoice.status == 'Not paid'}"></td>
+                                <td th:text="${invoice.dueDate}" th:unless="${invoice.dueDate < currentDate && invoice.status == 'Not paid'}"></td>
                                 <td th:text="${invoice.introductionDate}"></td>
                                 <td th:text="${invoice.status}"></td>
                                 <td>
@@ -88,7 +103,7 @@
                                     <a class="btn btn-outline-danger" th:href="@{/invoiceManagement/delete/{invoiceNumber}(invoiceNumber=${invoice.invoiceNumber})}"><i class="bi bi-trash"></i></a>
                                 </td>
                                 <td>
-                                    <a id="markAsPaidButton" class="btn btn-outline-info" th:href="@{/invoiceManagement/markAsPaid/{invoiceNumber}(invoiceNumber=${invoice.invoiceNumber})}">Mark as Paid</a>
+                                    <a id="markAsPaidButton" class="btn btn-outline-success" th:href="@{/invoiceManagement/markAsPaid/{invoiceNumber}(invoiceNumber=${invoice.invoiceNumber})}">Mark as Paid</a>
                                 </td>
                             </tr>
                         </tbody>

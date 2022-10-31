@@ -2,12 +2,12 @@ package ro.siit.FinalProject.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
+import ro.siit.FinalProject.api.Home.HomeApi;
 
 @Controller
-public class HomeController {
+public class HomeController implements HomeApi {
 
-    @GetMapping("/")
+    @Override
     public String homePage(Model model) {
         return "HomePage/home";
     }

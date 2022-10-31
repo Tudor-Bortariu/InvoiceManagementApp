@@ -13,17 +13,17 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface JpaSupplierRepository extends JpaRepository<Supplier, UUID> {
-    @Query(value = "SELECT s FROM Supplier s WHERE s.user = :user")
+    @Query(value = "SELECT s FROM #{#entityName} s WHERE s.user = :user")
     List<Supplier> findAllSuppliersByUser(User user);
 
     @Transactional
     @Modifying
-    @Query(value = "DELETE FROM Supplier s WHERE s.id=:id")
+    @Query(value = "DELETE FROM #{#entityName} s WHERE s.id=:id")
     void deleteBySupplierId(@Param("id") UUID id);
 
-    @Query(value = "SELECT s FROM Supplier s WHERE s.user = :user AND s.supplierName = :supplierName")
+    @Query(value = "SELECT s FROM #{#entityName} s WHERE s.user = :user AND s.supplierName = :supplierName")
     Optional<Supplier> findSupplierByUserAndName(User user, @Param("supplierName") String supplierName);
 
-    @Query(value = "SELECT s FROM Supplier s WHERE s.user = :user AND s.supplierName != :supplierName")
+    @Query(value = "SELECT s FROM #{#entityName} s WHERE s.user = :user AND s.supplierName != :supplierName")
     List<Supplier> supplierListWithoutCurrentSupplier(User user, @Param("supplierName") String currentSupplierName);
 }

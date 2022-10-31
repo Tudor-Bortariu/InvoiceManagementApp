@@ -3,7 +3,7 @@ package ro.siit.FinalProject.exception;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -15,10 +15,22 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ObjectNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<String> handleObjectNotFoundException (ObjectNotFoundException ex){
+    public String handleObjectNotFoundException (ObjectNotFoundException ex, Model model){
         LOGGER.error(ex.getMessage());
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ex.getMessage());
+        model.addAttribute("objectNotFoundExceptionMessage", ex.getMessage());
+
+        return "Exception/objectNotFoundException";
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public String handleIllegalArgumentException (IllegalArgumentException ex, Model model){
+        LOGGER.error(ex.getMessage());
+
+        model.addAttribute("illegalArgumentExceptionMessage", "Username is not available. Please go back and insert a different username to register.");
+
+        return "Exception/illegalArgumentException";
+    }
+
 }

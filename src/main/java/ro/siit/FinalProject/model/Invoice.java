@@ -17,7 +17,7 @@ public class Invoice {
     private String currency;
 
     @Column(name = "due_date", nullable = false)
-    private String dueDate;
+    private LocalDate dueDate;
 
     @Column(name = "introduction_date", nullable = false)
     private LocalDate introductionDate;
@@ -32,7 +32,7 @@ public class Invoice {
     @Column(name = "status", nullable = false)
     private String status;
 
-    public Invoice(String invoiceNumber, Double value, String currency, String dueDate, String status, Supplier supplier) {
+    public Invoice(String invoiceNumber, Double value, String currency, LocalDate dueDate, String status, Supplier supplier) {
         this.invoiceNumber = invoiceNumber;
         this.value = value;
         this.currency = currency;
@@ -42,7 +42,7 @@ public class Invoice {
         this.supplier = supplier;
     }
 
-    public Invoice (){
+    public Invoice(){
 
     }
 
@@ -66,11 +66,11 @@ public class Invoice {
         this.currency = currency;
     }
 
-    public String getDueDate() {
+    public LocalDate getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(String dueDate) {
+    public void setDueDate(LocalDate dueDate) {
         this.dueDate = dueDate;
     }
 

@@ -9,6 +9,7 @@ import ro.siit.FinalProject.model.Invoice;
 import ro.siit.FinalProject.model.User;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -16,17 +17,21 @@ import java.util.UUID;
 @Repository
 public interface JpaInvoiceRepository extends JpaRepository<Invoice, UUID> {
 
-    @Query(value = "SELECT i FROM Invoice i WHERE i.user = :user")
+    @Query(value = "SELECT i FROM #{#entityName} i WHERE i.user = :user")
     List<Invoice> findAllInvoicesByUser(User user);
 
     @Transactional
     @Modifying
-    @Query(value = "DELETE FROM Invoice i WHERE i.invoiceNumber=:invoiceNumber")
+    @Query(value = "DELETE FROM #{#entityName} i WHERE i.invoiceNumber=:invoiceNumber")
     void deleteByInvoiceNumber(@Param("invoiceNumber") String invoiceNumber);
 
-    @Query(value = "SELECT i FROM Invoice i WHERE i.invoiceNumber = :invoiceNumber")
+    @Query(value = "SELECT i FROM #{#entityName} i WHERE i.invoiceNumber = :invoiceNumber")
     Optional<Invoice> findInvoiceByNumber(@Param("invoiceNumber") String invoiceNumber);
 
-    @Query(value = "SELECT i FROM Invoice i WHERE i.user = :user AND i.status = :status")
-    List<Invoice> findInvoicesByStatus(User user, String status);
+    @Query(value = "SELECT i FROM #{#entityName} i WHERE i.user = :user AND i.status = :status")
+    List<Invoice> findInvoiceByStatus(User user, String status);
+
+    @Query(value = "SELECT i FROM #{#entityName} i WHERE i.user = :user AND i.status = :status AND i.dueDate <= :maximumDueDate")
+    List<Invoice> findInvoiceByDueDate (User user, LocalDate maximumDueDate, String status);
+
 }

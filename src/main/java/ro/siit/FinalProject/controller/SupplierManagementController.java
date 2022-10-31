@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
+import ro.siit.FinalProject.api.Supplier.SupplierApi;
 import ro.siit.FinalProject.exception.ObjectNotFoundException;
 import ro.siit.FinalProject.model.CustomUserDetails;
 import ro.siit.FinalProject.model.Supplier;
@@ -17,8 +18,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Controller
-@RequestMapping("supplierManagement")
-public class SupplierManagementController {
+public class SupplierManagementController implements SupplierApi {
 
     @Autowired
     private IAuthenticationFacade authenticationFacade;
@@ -26,7 +26,7 @@ public class SupplierManagementController {
     @Autowired
     public JpaSupplierRepository supplierRepository;
 
-    @GetMapping("")
+    @Override
     public String supplierManagement(Model model) {
         Authentication authentication = authenticationFacade.getAuthentication();
         User authenticatedUser = ((CustomUserDetails)authentication.getPrincipal()).getUser();
@@ -36,12 +36,12 @@ public class SupplierManagementController {
         return "SupplierManagement/supplierManagement";
     }
 
-    @GetMapping("/addSupplier")
+    @Override
     public String addSupplierForm(Model model) {
         return "SupplierManagement/addSupplier";
     }
 
-    @PostMapping("supplierManagement/addSupplier")
+    @Override
     public RedirectView addSupplier(Model model,
                                     @RequestParam String supplierName,
                                     @RequestParam String phoneNumber,
@@ -57,13 +57,13 @@ public class SupplierManagementController {
         return new RedirectView("/supplierManagement");
     }
 
-    @GetMapping("/delete/{id}")
+    @Override
     public RedirectView deleteSupplier(Model model, @PathVariable UUID id) {
         supplierRepository.deleteBySupplierId(id);
         return new RedirectView("/supplierManagement");
     }
 
-    @GetMapping("/edit/{id}")
+    @Override
     public String editSupplierForm(Model model, @PathVariable UUID id) {
         Optional<Supplier> supplier = supplierRepository.findById(id);
         model.addAttribute("supplier", supplier.orElseThrow(ObjectNotFoundException::new));
@@ -71,7 +71,7 @@ public class SupplierManagementController {
         return "SupplierManagement/editForm";
     }
 
-    @PostMapping("/edit")
+    @Override
     public RedirectView editInvoice(Model model,
                                     @RequestParam UUID supplierId,
                                     @RequestParam String updatedSupplierName,
