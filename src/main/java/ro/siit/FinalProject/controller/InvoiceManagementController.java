@@ -88,7 +88,7 @@ public class InvoiceManagementController implements InvoiceApi {
 
     @Override
     public String editInvoiceForm(Model model, @PathVariable String invoiceNumber) {
-        Optional<Invoice> invoice = invoiceRepository.findInvoiceByNumber(invoiceNumber+1);
+        Optional<Invoice> invoice = invoiceRepository.findInvoiceByNumber(invoiceNumber);
         List<String> statusOptions = Arrays.asList("Paid", "Not paid");
         List<String> currencyOptions = Arrays.asList("RON", "EUR", "USD");
 
