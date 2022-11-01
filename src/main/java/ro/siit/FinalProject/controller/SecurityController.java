@@ -30,7 +30,9 @@ public class SecurityController implements SecurityApi {
                                         @RequestParam("password2") String password,
                                         @RequestParam String email){
 
-        if(userRepository.findByUsername(username) == null){
+        if(userRepository.findByUsername(username).isPresent()) {
+            throw new IllegalArgumentException("Username is not available. Please insert a different Username.");
+        } else {
             User user = new User();
             user.setId(UUID.randomUUID());
             user.setUsername(username);
@@ -38,8 +40,6 @@ public class SecurityController implements SecurityApi {
             user.setEmail(email);
 
             userRepository.saveAndFlush(user);
-        }else{
-            throw new IllegalArgumentException("Username is not available. Unique constraint on database field.");
         }
 
         return "HomePage/home";

@@ -25,8 +25,8 @@ public interface JpaInvoiceRepository extends JpaRepository<Invoice, UUID> {
     @Query(value = "DELETE FROM #{#entityName} i WHERE i.invoiceNumber=:invoiceNumber")
     void deleteByInvoiceNumber(@Param("invoiceNumber") String invoiceNumber);
 
-    @Query(value = "SELECT i FROM #{#entityName} i WHERE i.invoiceNumber = :invoiceNumber")
-    Optional<Invoice> findInvoiceByNumber(@Param("invoiceNumber") String invoiceNumber);
+    @Query(value = "SELECT i FROM #{#entityName} i WHERE i.user = :user AND i.invoiceNumber = :invoiceNumber")
+    Optional<Invoice> findInvoiceByNumberAndUser(@Param("invoiceNumber") String invoiceNumber, User user);
 
     @Query(value = "SELECT i FROM #{#entityName} i WHERE i.user = :user AND i.status = :status")
     List<Invoice> findInvoiceByStatus(User user, String status);

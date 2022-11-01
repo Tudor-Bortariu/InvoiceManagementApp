@@ -28,7 +28,7 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
     public String handleIllegalArgumentException (IllegalArgumentException ex, Model model){
         LOGGER.error(ex.getMessage());
 
-        model.addAttribute("exceptionMessage", "Username is not available. Please go back and insert a different username to register.");
+        model.addAttribute("exceptionMessage", ex.getMessage());
 
         return "Exception/customExceptionPage";
     }

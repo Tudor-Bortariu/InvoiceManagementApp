@@ -41,16 +41,28 @@
 
 <div class="container">
     <div class="row">
-        <div class="col">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item active" aria-current="page">View all</li>
-            <li class="breadcrumb-item"><a th:href="@{/invoiceManagement/paidInvoices}">View Paid invoices</a></li>
-            <li class="breadcrumb-item"><a th:href="@{/invoiceManagement/unpaidInvoices}">View Unpaid invoices</a></li>
-            <li class="breadcrumb-item"><a th:href="@{/invoiceManagement/dueIn7Days}">Due in 7 Days</a></li>
-            <li class="breadcrumb-item"><a th:href="@{/invoiceManagement/dueIn30Days}">Due in 30 Days</a></li>
-        </ol>
-    </nav>
+        <div class="col-md-auto">
+            <a class="btn btn-outline-primary" th:href="@{/invoiceManagement}">View all</a>
+        </div>
+        <div class="col-md-auto">
+            <form method="get" action="invoiceManagement/filterByPaymentStatus">
+                <button type="submit" name="paymentStatus" value="Paid" class="btn btn-outline-primary">View Paid Invoices</button>
+            </form>
+        </div>
+        <div class="col-md-auto">
+            <form method="get" action="invoiceManagement/filterByPaymentStatus">
+                <button type="submit" name="paymentStatus" value="Not paid" class="btn btn-outline-primary">View Unpaid Invoices</button>
+            </form>
+        </div>
+        <div class="col-md-auto">
+            <form method="get" action="invoiceManagement/filterByDueDate">
+                <button type="submit" name="daysUntilDue" value="7" class="btn btn-outline-primary">Due in 7 Days</button>
+            </form>
+        </div>
+        <div class="col-md-auto">
+            <form method="get" action="invoiceManagement/filterByDueDate">
+                <button type="submit" name="daysUntilDue" value="30" class="btn btn-outline-primary">Due in 30 Days</button>
+            </form>
         </div>
         <div class="col-md-auto">
             <a class="btn btn-success" th:href="@{/invoiceManagement/addInvoice}" style="background-color: #04AA6D;">Add new Invoice</a>
@@ -59,7 +71,7 @@
 </div>
 
     <div class="container">
-        <div class="input-group">
+        <div class="input-group" style="margin: 10px 0;">
             <div class="input-group-prepend">
                 <span class="input-group-text">Filter by Supplier</span>
             </div>
@@ -71,43 +83,47 @@
     <p id="colorExplanation"><span id="colorSample">A</span> - Invoice is Not paid and Overdue.</p>
 </div>
 
-            <div class="managementTable">
-                <table class="table table-hover" id="invoiceTable">
-                    <thead class="thead-light">
-                    <tr>
-                        <th scope="col">Invoice Number</th>
-                        <th scope="col">Supplier Name</th>
-                        <th scope="col">Value</th>
-                        <th scope="col">Currency</th>
-                        <th scope="col">Due Date</th>
-                        <th scope="col">Introduction Date</th>
-                        <th scope="col">Payment Status</th>
-                        <th scope="col">Action</th>
-                        <th scope="col">Change Payment Status</th>
-                    </tr>
-                    </thead>
-                        <tbody>
-                            <tr th:each="invoice, iter:${invoices}">
-                                <th scope="row" th:text="${invoice.invoiceNumber}"></th>
-                                <td th:text="${invoice.supplier?.supplierName}"></td>
-                                <td th:text="${invoice.value}"></td>
-                                <td th:text="${invoice.currency}"></td>
-                                <td th:text="${invoice.dueDate}" style="background-color: #FFB6C1;" th:if="${invoice.dueDate < currentDate && invoice.status == 'Not paid'}"></td>
-                                <td th:text="${invoice.dueDate}" th:unless="${invoice.dueDate < currentDate && invoice.status == 'Not paid'}"></td>
-                                <td th:text="${invoice.introductionDate}"></td>
-                                <td th:text="${invoice.status}"></td>
-                                <td>
-                                    <a class="btn btn-outline-info" th:href="@{/invoiceManagement/edit/{invoiceNumber}(invoiceNumber=${invoice.invoiceNumber})}"><i class="bi bi-pencil-fill"></i></a>
-                                    <a class="btn btn-outline-danger" th:href="@{/invoiceManagement/delete/{invoiceNumber}(invoiceNumber=${invoice.invoiceNumber})}"><i class="bi bi-trash"></i></a>
-                                </td>
-                                <td>
-                                    <a id="markAsPaidButton" class="btn btn-outline-success" th:if="${invoice.status == 'Not paid'}" th:href="@{/invoiceManagement/markAsPaid/{invoiceNumber}(invoiceNumber=${invoice.invoiceNumber})}">Mark as Paid</a>
-                                    <a id="markAsUnpaidButton" class="btn btn-outline-info" th:unless="${invoice.status == 'Not paid'}" th:href="@{/invoiceManagement/markAsUnpaid/{invoiceNumber}(invoiceNumber=${invoice.invoiceNumber})}">Mark as Unpaid</a>
-                                </td>
-                            </tr>
-                        </tbody>
-                </table>
-            </div>
+    <div class="managementTable">
+        <table class="table table-hover" id="invoiceTable">
+            <thead class="thead-light">
+                <tr>
+                    <th scope="col">Invoice Number</th>
+                    <th scope="col">Supplier Name</th>
+                    <th scope="col">Value</th>
+                    <th scope="col">Currency</th>
+                    <th scope="col">Due Date</th>
+                    <th scope="col">Introduction Date</th>
+                    <th scope="col">Payment Status</th>
+                    <th scope="col">Action</th>
+                    <th scope="col">Change Payment Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="invoice, iter:${invoices}">
+                    <th scope="row" th:text="${invoice.invoiceNumber}"></th>
+                    <td th:text="${invoice.supplier?.supplierName}"></td>
+                    <td th:text="${invoice.value}"></td>
+                    <td th:text="${invoice.currency}"></td>
+                    <td th:text="${invoice.dueDate}" style="background-color: #FFB6C1;" th:if="${invoice.dueDate < currentDate && invoice.status == 'Not paid'}"></td>
+                    <td th:text="${invoice.dueDate}" th:unless="${invoice.dueDate < currentDate && invoice.status == 'Not paid'}"></td>
+                    <td th:text="${invoice.introductionDate}"></td>
+                    <td th:text="${invoice.status}"></td>
+                    <td>
+                        <a class="btn btn-outline-info" th:href="@{/invoiceManagement/edit/{invoiceNumber}(invoiceNumber=${invoice.invoiceNumber})}"><i class="bi bi-pencil-fill"></i></a>
+                        <a class="btn btn-outline-danger" th:href="@{/invoiceManagement/delete/{invoiceNumber}(invoiceNumber=${invoice.invoiceNumber})}"><i class="bi bi-trash"></i></a>
+                    </td>
+                    <td>
+                        <form method="get" th:action="@{/invoiceManagement/changePaymentStatus/{invoiceNumber}(invoiceNumber=${invoice.invoiceNumber})}" th:if="${invoice.status == 'Not paid'}">
+                            <button type="submit" name="paymentStatus" value="Paid" class="btn btn-outline-success">Mark as Paid</button>
+                        </form>
+                        <form method="get" th:action="@{/invoiceManagement/changePaymentStatus/{invoiceNumber}(invoiceNumber=${invoice.invoiceNumber})}" th:unless="${invoice.status == 'Not paid'}">
+                            <button type="submit" name="paymentStatus" value="Not paid" class="btn btn-outline-info">Mark as Unpaid</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
 </body>
 </html>
