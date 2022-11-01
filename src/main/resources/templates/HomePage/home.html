@@ -21,7 +21,7 @@
                 <a th:href="@{/invoiceManagement}" sec:authorize="isAuthenticated()">Manage your Invoices</a>
                 <a th:href="@{/supplierManagement}" sec:authorize="isAuthenticated()">My Suppliers</a>
                 <a th:href="@{/login}" sec:authorize="!isAuthenticated()">Login</a>
-                <a th:href="@{/logout}" sec:authorize="isAuthenticated()">Logout</a>
+                <a th:href="@{/logoutConfirm}" sec:authorize="isAuthenticated()">Logout</a>
                 <a th:href="@{/Security/register}" sec:authorize="!isAuthenticated()">Register</a>
             </div>
 

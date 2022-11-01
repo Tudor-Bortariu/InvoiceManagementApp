@@ -1,11 +1,14 @@
 package ro.siit.FinalProject.model;
 
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Table(name = "users")
+@NoArgsConstructor
 public class User {
     @Id
     @Column(name = "user_id")
@@ -27,9 +30,6 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY,
             cascade = CascadeType.ALL)
     private List<Supplier> suppliers;
-
-    public User() {
-    }
 
     public UUID getId() {
         return id;

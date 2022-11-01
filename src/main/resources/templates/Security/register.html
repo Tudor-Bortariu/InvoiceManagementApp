@@ -18,7 +18,7 @@
                 <div class="topnavDark">
                     <a class="nav-item nav-link" th:href="@{/}">To Home Page</a>
                     <a class="nav-item nav-link" th:href="@{/login}" sec:authorize="!isAuthenticated()">Login</a>
-                    <a class="nav-item nav-link" th:href="@{/login}" sec:authorize="isAuthenticated()">Logout</a>
+                    <a class="nav-item nav-link" th:href="@{/logoutConfirm}" sec:authorize="isAuthenticated()">Logout</a>
                 </div>
 
             </div>

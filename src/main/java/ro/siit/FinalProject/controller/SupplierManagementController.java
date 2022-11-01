@@ -52,6 +52,7 @@ public class SupplierManagementController implements SupplierApi {
         Authentication authentication = authenticationFacade.getAuthentication();
 
         addedSupplier.setUser(((CustomUserDetails)authentication.getPrincipal()).getUser());
+
         supplierRepository.saveAndFlush(addedSupplier);
 
         return new RedirectView("/supplierManagement");

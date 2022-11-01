@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestParam;
-import ro.siit.FinalProject.api.Registration.RegistrationApi;
+import ro.siit.FinalProject.api.Security.SecurityApi;
 import ro.siit.FinalProject.configuration.SecurityConfig;
 import ro.siit.FinalProject.model.User;
 import ro.siit.FinalProject.repository.UserRepository;
@@ -12,7 +12,7 @@ import ro.siit.FinalProject.repository.UserRepository;
 import java.util.UUID;
 
 @Controller
-public class RegistrationController implements RegistrationApi {
+public class SecurityController implements SecurityApi {
 
     SecurityConfig securityConfig = new SecurityConfig();
     @Autowired
@@ -39,9 +39,15 @@ public class RegistrationController implements RegistrationApi {
 
             userRepository.saveAndFlush(user);
         }else{
-            throw new IllegalArgumentException("Username is not available. Unique constraing on database field.");
+            throw new IllegalArgumentException("Username is not available. Unique constraint on database field.");
         }
 
         return "HomePage/home";
+    }
+
+    @Override
+    public String logoutConfirmation (Model model){
+
+        return "Security/logoutConfirm";
     }
 }

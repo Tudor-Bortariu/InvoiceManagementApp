@@ -1,12 +1,15 @@
 package ro.siit.FinalProject.model;
 
 
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Table(name = "suppliers")
+@NoArgsConstructor
 public class Supplier {
 
     @Id
@@ -34,10 +37,6 @@ public class Supplier {
         this.supplierName = supplierName.toUpperCase();
         this.phoneNumber = phoneNumber;
         this.county = county.toUpperCase();
-    }
-
-    public Supplier(){
-
     }
 
     public UUID getId() {

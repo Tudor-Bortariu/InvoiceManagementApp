@@ -18,9 +18,9 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
     public String handleObjectNotFoundException (ObjectNotFoundException ex, Model model){
         LOGGER.error(ex.getMessage());
 
-        model.addAttribute("objectNotFoundExceptionMessage", ex.getMessage());
+        model.addAttribute("exceptionMessage", ex.getMessage());
 
-        return "Exception/objectNotFoundException";
+        return "Exception/customExceptionPage";
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -28,9 +28,9 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
     public String handleIllegalArgumentException (IllegalArgumentException ex, Model model){
         LOGGER.error(ex.getMessage());
 
-        model.addAttribute("illegalArgumentExceptionMessage", "Username is not available. Please go back and insert a different username to register.");
+        model.addAttribute("exceptionMessage", "Username is not available. Please go back and insert a different username to register.");
 
-        return "Exception/illegalArgumentException";
+        return "Exception/customExceptionPage";
     }
 
 }

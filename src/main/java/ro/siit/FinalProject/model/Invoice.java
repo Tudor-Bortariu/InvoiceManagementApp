@@ -1,10 +1,13 @@
 package ro.siit.FinalProject.model;
 
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "invoices")
+@NoArgsConstructor
 public class Invoice {
     @Id
     @Column(name = "invoice_number", nullable = false)
@@ -40,10 +43,6 @@ public class Invoice {
         this.introductionDate = LocalDate.now();
         this.status = status;
         this.supplier = supplier;
-    }
-
-    public Invoice(){
-
     }
 
     public String getInvoiceNumber() {
