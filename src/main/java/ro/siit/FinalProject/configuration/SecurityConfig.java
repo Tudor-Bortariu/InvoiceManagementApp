@@ -42,7 +42,7 @@ public class SecurityConfig {
                                 .and()
                                 .formLogin()
                                 .usernameParameter("username")
-                                .defaultSuccessUrl("/invoiceManagement")
+                                .defaultSuccessUrl("/")
                                 .permitAll()
                                 .and()
                                 .logout().logoutSuccessUrl("/").permitAll();

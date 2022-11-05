@@ -14,6 +14,7 @@ import java.util.UUID;
 @Controller
 public class SecurityController implements SecurityApi {
 
+    @Autowired
     SecurityConfig securityConfig = new SecurityConfig();
     @Autowired
     UserRepository userRepository;
@@ -27,7 +28,9 @@ public class SecurityController implements SecurityApi {
     @Override
     public String sendRegistrationForm (Model model,
                                         @RequestParam String username,
-                                        @RequestParam("password2") String password,
+                                        @RequestParam("passwordCheck") String password,
+                                        @RequestParam String firstName,
+                                        @RequestParam String lastName,
                                         @RequestParam String email){
 
         if(userRepository.findByUsername(username).isPresent()) {
@@ -36,6 +39,8 @@ public class SecurityController implements SecurityApi {
             User user = new User();
             user.setId(UUID.randomUUID());
             user.setUsername(username);
+            user.setFirstName(firstName);
+            user.setLastName(lastName);
             user.setPassword(securityConfig.passwordEncoder().encode(password));
             user.setEmail(email);
 
@@ -48,6 +53,6 @@ public class SecurityController implements SecurityApi {
     @Override
     public String logoutConfirmation (Model model){
 
-        return "Security/logoutConfirm";
+        return "Security/logoutConfirmation";
     }
 }

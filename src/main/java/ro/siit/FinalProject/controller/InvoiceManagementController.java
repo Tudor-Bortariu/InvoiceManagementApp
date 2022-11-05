@@ -3,6 +3,7 @@ package ro.siit.FinalProject.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
@@ -17,10 +18,10 @@ import ro.siit.FinalProject.repository.JpaSupplierRepository;
 import ro.siit.FinalProject.service.IAuthenticationFacade;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Controller
 public class InvoiceManagementController implements InvoiceApi {
@@ -35,22 +36,18 @@ public class InvoiceManagementController implements InvoiceApi {
 
     @Override
     public String invoiceManagement(Model model) {
-        Authentication authentication = authenticationFacade.getAuthentication();
-        User authenticatedUser = ((CustomUserDetails)authentication.getPrincipal()).getUser();
 
-        model.addAttribute("invoices", invoiceRepository.findAllInvoicesByUser(authenticatedUser));
-        model.addAttribute("suppliers", supplierRepository.findAllSuppliersByUser(authenticatedUser));
+        model.addAttribute("invoices", invoiceRepository.findAllInvoicesByUser(getUser()));
+        model.addAttribute("suppliers", supplierRepository.findAllSuppliersByUser(getUser()));
         model.addAttribute("currentDate", LocalDate.now());
 
         return "InvoiceManagement/invoiceManagement";
     }
 
     @Override
-    public String addInvoiceForm(Model model){
-        Authentication authentication = authenticationFacade.getAuthentication();
-        User authenticatedUser = ((CustomUserDetails)authentication.getPrincipal()).getUser();
+    public String addInvoiceForm(Model model) {
 
-        model.addAttribute("supplierList", supplierRepository.findAllSuppliersByUser(authenticatedUser));
+        model.addAttribute("supplierList", supplierRepository.findAllSuppliersByUser(getUser()));
         model.addAttribute("currentDate", LocalDate.now());
         model.addAttribute("minDate", LocalDate.now().minusYears(1));
         model.addAttribute("maxDate", LocalDate.now().plusYears(2));
@@ -67,19 +64,18 @@ public class InvoiceManagementController implements InvoiceApi {
                                    @RequestParam String dueDate,
                                    @RequestParam String paymentStatus) {
 
-        Authentication authentication = authenticationFacade.getAuthentication();
-        User authenticatedUser = ((CustomUserDetails)authentication.getPrincipal()).getUser();
-
-        if(invoiceRepository.findInvoiceByNumberAndUser(invoiceNumber.toUpperCase(), authenticatedUser).isPresent()){
+        if (invoiceRepository.findInvoiceByNumberAndUser(invoiceNumber, getUser()).isPresent()) {
             throw new IllegalArgumentException("Invoice number already exists in this database. Please insert a different number for the Invoice.");
-        }else {
+        } else {
 
-            Optional<Supplier> supplier = supplierRepository.findSupplierByUserAndName(authenticatedUser, supplierName);
+            Supplier supplier = supplierRepository
+                    .findSupplierByUserAndName(getUser(), supplierName)
+                    .orElseThrow(ObjectNotFoundException::new);
 
             Invoice addedInvoice =
-                    new Invoice(invoiceNumber.toUpperCase(), value, currency, LocalDate.parse(dueDate), paymentStatus, supplier.orElseThrow(ObjectNotFoundException::new));
+                    new Invoice(invoiceNumber, value, currency, LocalDate.parse(dueDate), paymentStatus, supplier);
 
-            addedInvoice.setUser(((CustomUserDetails) authentication.getPrincipal()).getUser());
+            addedInvoice.setUser(getUser());
             invoiceRepository.saveAndFlush(addedInvoice);
         }
 
@@ -92,23 +88,24 @@ public class InvoiceManagementController implements InvoiceApi {
         return new RedirectView("/invoiceManagement");
     }
 
+
     @Override
     public String editInvoiceForm(Model model, @PathVariable String invoiceNumber) {
-        Authentication authentication = authenticationFacade.getAuthentication();
-        User authenticatedUser = ((CustomUserDetails)authentication.getPrincipal()).getUser();
 
-        Optional<Invoice> invoice = invoiceRepository.findInvoiceByNumberAndUser(invoiceNumber, authenticatedUser);
-        List<String> statusOptions = Arrays.asList("Paid", "Not paid");
-        List<String> currencyOptions = Arrays.asList("RON", "EUR", "USD");
+        Invoice invoice = invoiceRepository
+                .findInvoiceByNumberAndUser(invoiceNumber, getUser())
+                .orElseThrow(ObjectNotFoundException::new);
 
-        model.addAttribute("invoice", invoice.orElseThrow(ObjectNotFoundException::new));
+        model.addAttribute("invoice", invoice);
+
+        String currentInvoiceSupplierName = invoice.getSupplier().getSupplierName();
 
         model.addAttribute("supplierList",
-                supplierRepository.supplierListWithoutCurrentSupplier(authenticatedUser, invoice.get().getSupplier().getSupplierName()));
+                supplierRepository.supplierListWithoutCurrentSupplier(getUser(), currentInvoiceSupplierName));
 
-        model.addAttribute("availableStatus", getRemainedInvoiceStatusOptions(invoice.get(), statusOptions));
+        model.addAttribute("availableStatus", getRemainedInvoiceStatusOptions(invoice));
 
-        model.addAttribute("currencyList", getRemainedInvoiceCurrencyOptions(invoice.get(), currencyOptions));
+        model.addAttribute("currencyList", getRemainedInvoiceCurrencyOptions(invoice));
 
         model.addAttribute("minDate", LocalDate.now().minusYears(1));
         model.addAttribute("maxDate", LocalDate.now().plusYears(2));
@@ -118,79 +115,78 @@ public class InvoiceManagementController implements InvoiceApi {
 
     @Override
     public RedirectView editInvoice(Model model,
-                                   @RequestParam String invoiceNumber,
-                                   @RequestParam String updatedSupplierName,
-                                   @RequestParam Double updatedValue,
-                                   @RequestParam String updatedCurrency,
-                                   @RequestParam String updatedDueDate,
-                                   @RequestParam String updatedStatus) {
+                                    @RequestParam String invoiceNumber,
+                                    @RequestParam String updatedSupplierName,
+                                    @RequestParam Double updatedValue,
+                                    @RequestParam String updatedCurrency,
+                                    @RequestParam String updatedDueDate,
+                                    @RequestParam String updatedStatus) {
 
-        Authentication authentication = authenticationFacade.getAuthentication();
-        User authenticatedUser = ((CustomUserDetails)authentication.getPrincipal()).getUser();
+        Invoice invoice = invoiceRepository
+                .findInvoiceByNumberAndUser(invoiceNumber, getUser())
+                .orElseThrow(ObjectNotFoundException::new);
+        Supplier updatedSupplier = supplierRepository
+                .findSupplierByUserAndName(getUser(), updatedSupplierName)
+                .orElseThrow(ObjectNotFoundException::new);
 
-        Optional<Invoice> invoice = invoiceRepository.findInvoiceByNumberAndUser(invoiceNumber, authenticatedUser);
-        Optional<Supplier> updatedSupplier = supplierRepository.findSupplierByUserAndName(authenticatedUser, updatedSupplierName);
+        invoice.setSupplier(updatedSupplier);
+        invoice.setValue(updatedValue);
+        invoice.setCurrency(updatedCurrency);
+        invoice.setDueDate(LocalDate.parse(updatedDueDate));
+        invoice.setStatus(updatedStatus);
 
-        invoice.orElseThrow(ObjectNotFoundException::new).setSupplier(updatedSupplier.orElseThrow(ObjectNotFoundException::new));
-        invoice.get().setValue(updatedValue);
-        invoice.get().setCurrency(updatedCurrency);
-        invoice.get().setDueDate(LocalDate.parse(updatedDueDate));
-        invoice.get().setStatus(updatedStatus);
-
-        invoiceRepository.saveAndFlush(invoice.get());
+        invoiceRepository.saveAndFlush(invoice);
 
         return new RedirectView("/invoiceManagement");
     }
 
     @Override
     public RedirectView changePaymentStatus(Model model, @PathVariable String invoiceNumber, @RequestParam String paymentStatus) {
-        Authentication authentication = authenticationFacade.getAuthentication();
-        User authenticatedUser = ((CustomUserDetails)authentication.getPrincipal()).getUser();
 
-        Optional<Invoice> invoice = invoiceRepository.findInvoiceByNumberAndUser(invoiceNumber, authenticatedUser);
+        Optional<Invoice> invoice = invoiceRepository.findInvoiceByNumberAndUser(invoiceNumber, getUser());
 
         invoice.orElseThrow(ObjectNotFoundException::new).setStatus(paymentStatus);
-            invoiceRepository.saveAndFlush(invoice.get());
+        invoiceRepository.saveAndFlush(invoice.get());
 
         return new RedirectView("/invoiceManagement");
     }
 
     @Override
-    public String getInvoicesByPaymentStatus(Model model, @RequestParam String paymentStatus) {
-        Authentication authentication = authenticationFacade.getAuthentication();
-        User authenticatedUser = ((CustomUserDetails)authentication.getPrincipal()).getUser();
+    public String getFilteredInvoices(Model model, @RequestParam String filterParam) {
 
-        model.addAttribute("customInvoiceFilter", invoiceRepository.findInvoiceByStatus(authenticatedUser,paymentStatus));
-        model.addAttribute("paymentStatus", paymentStatus);
+        getInvoiceListWithCustomInputFilter(filterParam, model);
+
+        model.addAttribute("filterParam", filterParam);
         model.addAttribute("currentDate", LocalDate.now());
 
-        return "InvoiceManagement/customFilterInvoiceManagement";
+        return "InvoiceManagement/customFilterInvoiceTable";
     }
 
-    @Override
-    public String getInvoicesByDueDate(Model model, @RequestParam String daysUntilDue) {
-        Authentication authentication = authenticationFacade.getAuthentication();
-        User authenticatedUser = ((CustomUserDetails)authentication.getPrincipal()).getUser();
-
-        model.addAttribute("customInvoiceFilter",
-                invoiceRepository.findInvoiceByDueDate(authenticatedUser, LocalDate.now().plusDays(Integer.parseInt(daysUntilDue)), "Not paid"));
-        model.addAttribute("currentDate", LocalDate.now());
-        model.addAttribute("daysUntilDue", daysUntilDue);
-
-        return "InvoiceManagement/customFilterInvoiceManagement";
-    }
-
-    private List<String> getRemainedInvoiceStatusOptions(Invoice invoice, List<String> allStatusOptions) {
-        return allStatusOptions
-                .stream()
+    private List<String> getRemainedInvoiceStatusOptions(Invoice invoice) {
+        return Stream.of("Paid", "Not paid")
                 .filter(status -> !status.equals(invoice.getStatus()))
                 .collect(Collectors.toList());
     }
 
-    private List<String> getRemainedInvoiceCurrencyOptions(Invoice invoice, List<String> allCurrencyOptions) {
-        return allCurrencyOptions
-                .stream()
+    private List<String> getRemainedInvoiceCurrencyOptions(Invoice invoice) {
+        return Stream.of("RON", "EUR", "USD")
                 .filter(status -> !status.equals(invoice.getCurrency()))
                 .collect(Collectors.toList());
+    }
+
+    private User getUser() {
+        Authentication authentication = authenticationFacade.getAuthentication();
+        return ((CustomUserDetails) authentication.getPrincipal()).getUser();
+    }
+
+    private void getInvoiceListWithCustomInputFilter(String filterParam, Model model) {
+        if (filterParam.equals("Paid") || filterParam.equals("Not paid")) {
+            model.addAttribute("filteredInvoiceList", invoiceRepository.findInvoiceByStatus(getUser(), filterParam));
+        } else if (filterParam.equals("7") || filterParam.equals("30")) {
+            model.addAttribute("filteredInvoiceList",
+                    invoiceRepository.findInvoiceByDueDate(getUser(), LocalDate.now().plusDays(Integer.parseInt(filterParam)), "Not paid"));
+        } else {
+            model.addAttribute("invoices", invoiceRepository.findAllInvoicesByUser(getUser()));
+        }
     }
 }

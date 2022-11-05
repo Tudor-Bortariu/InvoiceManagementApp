@@ -18,11 +18,11 @@
         <div class="bg-dark p-4">
 
             <div class="topnavDark">
-                <a th:href="@{/invoiceManagement}" sec:authorize="isAuthenticated()">Manage your Invoices</a>
+                <a th:href="@{/invoiceManagement}">Manage your Invoices</a>
                 <a th:href="@{/supplierManagement}" sec:authorize="isAuthenticated()">My Suppliers</a>
                 <a th:href="@{/login}" sec:authorize="!isAuthenticated()">Login</a>
                 <a th:href="@{/logoutConfirm}" sec:authorize="isAuthenticated()">Logout</a>
-                <a th:href="@{/Security/register}" sec:authorize="!isAuthenticated()">Register</a>
+                <a th:href="@{/register}" sec:authorize="!isAuthenticated()">Register</a>
             </div>
 
         </div>
@@ -35,10 +35,22 @@
 </div>
 
     <h1 align="center" class="display-5">Invoice Management Application</h1>
+        <div class="container">
+            <hr/>
+        </div>
 
-    <div class="container" align="center">
+    <div class="container">
+        <p id="greetingMessage" sec:authorize="isAuthenticated()" th:text="'Welcome, ' + ${userFirstName} + '!'"></p>
+    </div>
+
+    <div class="container" align="center" sec:authorize="isAnonymous()">
         <a th:href="@{/register}" class="btn btn-primary btn-lg btn-block" id="registerButton" style="background-color: #04AA6D;">
             Register and start tracking your invoices with ease.
+        </a>
+    </div>
+    <div class="container" align="center" sec:authorize="isAuthenticated()">
+        <a th:href="@{/invoiceManagement}" class="btn btn-primary btn-lg btn-block" id="manageInvoicePage" style="background-color: #04AA6D;">
+            Manage your Invoices
         </a>
     </div>
 

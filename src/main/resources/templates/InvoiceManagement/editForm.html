@@ -51,11 +51,11 @@
             <div class="row">
                 <div class="col">
                     <label for="value" class="form-label"> Modify Invoice Value</label>
-                    <input th:value="${invoice.value}" type="number" class="form-control" name="updatedValue" id="value" aria-describedby="value" step="0.01">
+                    <input th:value="${invoice.value}" type="number" class="form-control" name="updatedValue" id="value" aria-describedby="value" step="0.01" min="0.01" required>
                 </div>
                 <div class="col">
                     <label for="currency" class="form-label">Modify Invoice Currency </label>
-                    <select name="updatedCurrency" id="currency" class="form-control" aria-describedby="currency">
+                    <select name="updatedCurrency" id="currency" class="form-control" aria-describedby="currency" required>
                         <option th:value="${invoice.currency}" th:text="${invoice.currency}"></option>
                         <option th:each="currency : ${currencyList}" th:value="${currency}" th:text="${currency}"></option>
                     </select>
@@ -63,11 +63,11 @@
             </div>
             <div>
                 <label for="dueDate" class="form-label">Modify Due Date</label>
-                <input th:value="${invoice.dueDate}" type="date" class="form-control" name="updatedDueDate" id="dueDate" th:min="${minDate}" th:max="${maxDate}">
+                <input th:value="${invoice.dueDate}" type="date" class="form-control" name="updatedDueDate" id="dueDate" th:min="${minDate}" th:max="${maxDate}" required>
             </div>
             <div>
                 <label for="paymentStatus" class="form-label">Modify Payment Status</label>
-                <select name="updatedStatus" id="paymentStatus" class="form-control" aria-describedby="paymentStatus">
+                <select name="updatedStatus" id="paymentStatus" class="form-control" aria-describedby="paymentStatus" required>
                     <option th:value="${invoice.status}" th:text="${invoice.status}"></option>
                     <option th:each="status : ${availableStatus}" th:value="${status}" th:text="${status}"></option>
                 </select>

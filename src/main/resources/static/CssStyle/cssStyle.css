@@ -17,6 +17,7 @@
 h1 {
     color: #000000;
     font-family: 'Droid serif', serif;
+    font-style: italic;
     font-size: 48px;
     font-weight: 500;
     line-height: 44px;
@@ -94,6 +95,23 @@ h1 {
     background-color: #FFB6C1;
   }
 
+  #greetingMessage {
+    font-family: 'Droid serif', serif;
+    font-style: italic;
+    margin: 10px 0;
+    font-size: 36px;
+    text-align: center;
+    font-weight: bold;
+    color: #04AA6D;
+  }
+
+  hr {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    border: 0;
+    border-top: 1px solid;
+  }
+
   h2 {
       color: #000000;
       font-family: 'Droid serif', serif;
@@ -102,6 +120,12 @@ h1 {
       line-height: 44px;
       margin: 12px 0;
       text-align: center;
+   }
+
+   .filterLabel {
+    font-family: 'Droid serif', serif;
+    font-style: italic;
+    font-size: 18px;
    }
 
 

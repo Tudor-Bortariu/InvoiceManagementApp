@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface JpaSupplierRepository extends JpaRepository<Supplier, UUID> {
-    @Query(value = "SELECT s FROM #{#entityName} s WHERE s.user = :user")
+    @Query(value = "SELECT s FROM #{#entityName} s WHERE s.user = :user ORDER BY s.supplierName ASC")
     List<Supplier> findAllSuppliersByUser(User user);
 
     @Transactional
@@ -24,6 +24,6 @@ public interface JpaSupplierRepository extends JpaRepository<Supplier, UUID> {
     @Query(value = "SELECT s FROM #{#entityName} s WHERE s.user = :user AND s.supplierName = :supplierName")
     Optional<Supplier> findSupplierByUserAndName(User user, @Param("supplierName") String supplierName);
 
-    @Query(value = "SELECT s FROM #{#entityName} s WHERE s.user = :user AND s.supplierName != :supplierName")
+    @Query(value = "SELECT s FROM #{#entityName} s WHERE s.user = :user AND s.supplierName != :supplierName ORDER BY s.supplierName ASC")
     List<Supplier> supplierListWithoutCurrentSupplier(User user, @Param("supplierName") String currentSupplierName);
 }

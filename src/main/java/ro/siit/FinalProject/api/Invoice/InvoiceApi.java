@@ -40,9 +40,6 @@ public interface InvoiceApi {
     @GetMapping("/changePaymentStatus/{invoiceNumber}")
     public RedirectView changePaymentStatus(Model model, @PathVariable String invoiceNumber, @RequestParam String paymentStatus);
 
-    @GetMapping("/filterByPaymentStatus")
-    public String getInvoicesByPaymentStatus(Model model, @RequestParam String paymentStatus);
-
-    @GetMapping("/filterByDueDate")
-    public String getInvoicesByDueDate(Model model, @RequestParam String daysUntilDue);
+    @GetMapping("/filteredInvoiceTable")
+    public String getFilteredInvoices(Model model, @RequestParam String filterParam);
 }
