@@ -1,18 +1,16 @@
 package ro.siit.FinalProject.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
-import ro.siit.FinalProject.api.Supplier.SupplierApi;
+import ro.siit.FinalProject.api.SupplierApi;
 import ro.siit.FinalProject.exception.ObjectNotFoundException;
-import ro.siit.FinalProject.model.CustomUserDetails;
 import ro.siit.FinalProject.model.Supplier;
-import ro.siit.FinalProject.model.User;
 import ro.siit.FinalProject.repository.JpaSupplierRepository;
-import ro.siit.FinalProject.service.IAuthenticationFacade;
+import ro.siit.FinalProject.service.InvoiceServiceImpl;
+import ro.siit.FinalProject.service.SecurityServiceImpl;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -21,17 +19,17 @@ import java.util.UUID;
 public class SupplierManagementController implements SupplierApi {
 
     @Autowired
-    private IAuthenticationFacade authenticationFacade;
+    private SecurityServiceImpl securityService;
 
     @Autowired
-    public JpaSupplierRepository supplierRepository;
+    private JpaSupplierRepository supplierRepository;
+
+    @Autowired
+    private InvoiceServiceImpl invoiceService;
 
     @Override
     public String supplierManagement(Model model) {
-        Authentication authentication = authenticationFacade.getAuthentication();
-        User authenticatedUser = ((CustomUserDetails)authentication.getPrincipal()).getUser();
-
-        model.addAttribute("suppliers", supplierRepository.findAllSuppliersByUser(authenticatedUser));
+        model.addAttribute("suppliers", supplierRepository.findAllSuppliersByUser(securityService.getUser()));
 
         return "SupplierManagement/supplierManagement";
     }
@@ -49,9 +47,9 @@ public class SupplierManagementController implements SupplierApi {
 
         Supplier addedSupplier = new Supplier(UUID.randomUUID(), supplierName, phoneNumber, county);
 
-        Authentication authentication = authenticationFacade.getAuthentication();
+        invoiceService.checkIfSupplierExistsForUser(addedSupplier);
 
-        addedSupplier.setUser(((CustomUserDetails)authentication.getPrincipal()).getUser());
+        addedSupplier.setUser(securityService.getUser());
 
         supplierRepository.saveAndFlush(addedSupplier);
 

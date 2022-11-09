@@ -5,18 +5,16 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import ro.siit.FinalProject.api.Home.HomeApi;
+import ro.siit.FinalProject.api.HomeApi;
 import ro.siit.FinalProject.model.CustomUserDetails;
 import ro.siit.FinalProject.model.User;
 import ro.siit.FinalProject.service.IAuthenticationFacade;
-
-import java.util.Optional;
 
 @Controller
 public class HomeController implements HomeApi {
 
     @Autowired
-    IAuthenticationFacade authenticationFacade;
+    private IAuthenticationFacade authenticationFacade;
 
     @Override
     public String homePage(Model model) {

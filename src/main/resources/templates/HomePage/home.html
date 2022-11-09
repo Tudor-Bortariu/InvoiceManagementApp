@@ -14,10 +14,11 @@
 <body>
 
 <div class="pos-f-t">
-    <div class="collapse" id="navbarToggleExternalContent">
-        <div class="bg-dark p-4">
+    <div class="bg-dark p-2">
+        <div class="bg-dark p-2">
 
             <div class="topnavDark">
+                <a class="navbar-brand">Menu</a>
                 <a th:href="@{/invoiceManagement}">Manage your Invoices</a>
                 <a th:href="@{/supplierManagement}" sec:authorize="isAuthenticated()">My Suppliers</a>
                 <a th:href="@{/login}" sec:authorize="!isAuthenticated()">Login</a>
@@ -27,11 +28,6 @@
 
         </div>
     </div>
-    <nav class="navbar navbar-dark bg-dark">
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </nav>
 </div>
 
     <h1 align="center" class="display-5">Invoice Management Application</h1>

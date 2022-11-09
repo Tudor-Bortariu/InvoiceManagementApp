@@ -1,4 +1,4 @@
-package ro.siit.FinalProject.api.Security;
+package ro.siit.FinalProject.api;
 
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;

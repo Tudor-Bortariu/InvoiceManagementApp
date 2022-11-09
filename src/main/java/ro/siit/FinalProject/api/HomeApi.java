@@ -1,4 +1,4 @@
-package ro.siit.FinalProject.api.Home;
+package ro.siit.FinalProject.api;
 
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;

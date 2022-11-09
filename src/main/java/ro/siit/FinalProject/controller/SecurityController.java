@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestParam;
-import ro.siit.FinalProject.api.Security.SecurityApi;
+import ro.siit.FinalProject.api.SecurityApi;
 import ro.siit.FinalProject.configuration.SecurityConfig;
 import ro.siit.FinalProject.model.User;
 import ro.siit.FinalProject.repository.UserRepository;
@@ -15,9 +15,9 @@ import java.util.UUID;
 public class SecurityController implements SecurityApi {
 
     @Autowired
-    SecurityConfig securityConfig = new SecurityConfig();
+    private SecurityConfig securityConfig = new SecurityConfig();
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Override
     public String invoiceManagement(Model model) {

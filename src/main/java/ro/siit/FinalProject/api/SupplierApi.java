@@ -1,4 +1,4 @@
-package ro.siit.FinalProject.api.Supplier;
+package ro.siit.FinalProject.api;
 
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +15,7 @@ public interface SupplierApi {
     @GetMapping("/addSupplier")
     String addSupplierForm(Model model);
 
-    @PostMapping("supplierManagement/addSupplier")
+    @PostMapping("/addSupplier")
     public RedirectView addSupplier(Model model,
                                     @RequestParam String supplierName,
                                     @RequestParam String phoneNumber,

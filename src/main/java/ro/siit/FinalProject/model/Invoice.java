@@ -1,13 +1,15 @@
 package ro.siit.FinalProject.model;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "invoices")
-@NoArgsConstructor
+@NoArgsConstructor @Setter @Getter
 public class Invoice {
     @Id
     @Column(name = "invoice_number", nullable = false)
@@ -43,61 +45,5 @@ public class Invoice {
         this.introductionDate = LocalDate.now();
         this.status = status;
         this.supplier = supplier;
-    }
-
-    public String getInvoiceNumber() {
-        return invoiceNumber;
-    }
-
-    public Double getValue() {
-        return value;
-    }
-
-    public void setValue(Double value) {
-        this.value = value;
-    }
-
-    public String getCurrency() {
-        return currency;
-    }
-
-    public void setCurrency(String currency) {
-        this.currency = currency;
-    }
-
-    public LocalDate getDueDate() {
-        return dueDate;
-    }
-
-    public void setDueDate(LocalDate dueDate) {
-        this.dueDate = dueDate;
-    }
-
-    public LocalDate getIntroductionDate() {
-        return introductionDate;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public Supplier getSupplier() {
-        return supplier;
-    }
-
-    public void setSupplier(Supplier supplier) {
-        this.supplier = supplier;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 }

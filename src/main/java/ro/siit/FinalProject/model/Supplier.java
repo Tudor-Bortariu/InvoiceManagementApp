@@ -1,22 +1,24 @@
 package ro.siit.FinalProject.model;
 
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.List;
 import java.util.UUID;
 
-@Entity
 @Table(name = "suppliers")
-@NoArgsConstructor
+@Entity
+@NoArgsConstructor @Setter @Getter
 public class Supplier {
 
     @Id
     @Column(name = "supplier_id")
     private UUID id;
 
-    @Column(nullable = false, name = "supplier_name", unique = true)
+    @Column(nullable = false, name = "supplier_name")
     private String supplierName;
 
     @Column(name = "phone_number")
@@ -36,46 +38,6 @@ public class Supplier {
         this.id = id;
         this.supplierName = supplierName.toUpperCase();
         this.phoneNumber = phoneNumber;
-        this.county = county.toUpperCase();
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public String getSupplierName() {
-        return supplierName;
-    }
-
-    public void setSupplierName(String supplierName) {
-        this.supplierName = supplierName.toUpperCase();
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public String getCounty() {
-        return county;
-    }
-
-    public void setCounty(String county) {
         this.county = county.toUpperCase();
     }
 }

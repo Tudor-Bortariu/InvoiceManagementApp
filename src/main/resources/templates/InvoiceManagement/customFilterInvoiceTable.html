@@ -19,10 +19,11 @@
 <body>
 
 <div class="pos-f-t">
-    <div class="collapse" id="navbarToggleExternalContent">
-        <div class="bg-dark p-4">
+    <div class="bg-dark p-2">
+        <div class="bg-dark p-2">
 
             <div class="topnav">
+                <a class="nav-link" href="">Menu</a>
                 <a class="nav-item nav-link" th:href="@{/}">To Home Page</a>
                 <a class="nav-item nav-link" th:href="@{/invoiceManagement}">Manage All Invoices</a>
                 <a class="nav-item nav-link" th:href="@{/invoiceManagement/addInvoice}">Add new invoice</a>
@@ -32,11 +33,6 @@
 
         </div>
     </div>
-    <nav class="navbar navbar-dark bg-dark">
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </nav>
 </div>
 
 <h1 align="center" th:switch="${filterParam}">

@@ -19,10 +19,11 @@
 <body>
 
 <div class="pos-f-t">
-    <div class="collapse" id="navbarToggleExternalContent1">
-        <div class="bg-dark p-4">
+    <div class="bg-dark p-2">
+        <div class="bg-dark p-2">
 
             <div class="topnav">
+                <a class="nav-link" href="">Menu</a>
                 <a th:href="@{/}">Home Page</a>
                 <a th:href="@{/supplierManagement}">My Suppliers</a>
                 <a th:href="@{/logoutConfirm}" sec:authorize="isAuthenticated()">Logout</a>
@@ -30,11 +31,6 @@
 
         </div>
     </div>
-    <nav class="navbar navbar-dark bg-dark">
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggleExternalContent1" aria-controls="navbarToggleExternalContent1" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </nav>
 </div>
 
 <h1 align="center">Your Invoices</h1>

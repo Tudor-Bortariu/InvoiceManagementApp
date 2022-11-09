@@ -1,4 +1,4 @@
-package ro.siit.FinalProject.api.Invoice;
+package ro.siit.FinalProject.api;
 
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +13,7 @@ public interface InvoiceApi {
     @GetMapping("/addInvoice")
     String addInvoiceForm(Model model);
 
-    @PostMapping("invoiceManagement/addInvoice")
+    @PostMapping("/addInvoice")
     public RedirectView addInvoice(Model model,
                                    @RequestParam String invoiceNumber,
                                    @RequestParam String supplierName,
