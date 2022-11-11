@@ -32,17 +32,19 @@
     <h1 th:text="'Edit invoice ' + ${invoice.invoiceNumber}"></h1>
 
     <div class="container">
-        <form method="post" th:action="@{/invoiceManagement/edit}">
-            <div class="mb-3">
+        <form method="post" th:action="@{/invoiceManagement/edit}" enctype="multipart/form-data">
+            <div class="row">
+            <div class="col">
                 <label for="invoiceNumber" class="form-label">Invoice Number</label>
                 <input th:value="${invoice.invoiceNumber}" type="text" class="form-control" id="invoiceNumber" aria-describedby="number" name="invoiceNumber" readonly>
             </div>
-            <div class="mb-3">
+            <div class="col">
                 <label for="updatedSupplier">Update Supplier Name</label>
                 <select name="updatedSupplierName" required class="form-control" id="updatedSupplier">
                     <option th:value="${invoice.supplier.supplierName}" th:text="${invoice.supplier.supplierName}"></option>
                     <option th:each="supplier : ${supplierList}" th:value="${supplier.supplierName}" th:text="${supplier.supplierName}"></option>
                 </select>
+            </div>
             </div>
             <div class="row">
                 <div class="col">
@@ -57,16 +59,24 @@
                     </select>
                 </div>
             </div>
-            <div>
-                <label for="dueDate" class="form-label">Modify Due Date</label>
-                <input th:value="${invoice.dueDate}" type="date" class="form-control" name="updatedDueDate" id="dueDate" th:min="${minDate}" th:max="${maxDate}" required>
-            </div>
-            <div>
+            <div class="row">
+                <div class="col">
+                    <label for="dueDate" class="form-label">Modify Due Date</label>
+                    <input th:value="${invoice.dueDate}" type="date" class="form-control" name="updatedDueDate" id="dueDate" th:min="${minDate}" th:max="${maxDate}" required>
+                </div>
+            <div class="col">
                 <label for="paymentStatus" class="form-label">Modify Payment Status</label>
                 <select name="updatedStatus" id="paymentStatus" class="form-control" aria-describedby="paymentStatus" required>
                     <option th:value="${invoice.status}" th:text="${invoice.status}"></option>
                     <option th:each="status : ${availableStatus}" th:value="${status}" th:text="${status}"></option>
                 </select>
+            </div>
+            </div>
+            <div class="row">
+                <div class="container">
+                    <label for="updatedInvoiceImage" class="form-label">Upload Invoice Image</label>
+                    <input id="updatedInvoiceImage" class="form-control" type="file" name="updatedInvoiceImage" accept="image/png, image/gif, image/jpeg" multiple>
+                </div>
             </div>
             <div>
                 <button type="submit" class="btn btn-primary" style="margin: 10px 0; background-color: #04AA6D;">Submit</button>

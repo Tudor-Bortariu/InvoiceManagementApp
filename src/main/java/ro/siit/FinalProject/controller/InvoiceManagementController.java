@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.view.RedirectView;
 import ro.siit.FinalProject.api.InvoiceApi;
 import ro.siit.FinalProject.exception.ObjectNotFoundException;
@@ -15,6 +16,7 @@ import ro.siit.FinalProject.repository.JpaSupplierRepository;
 import ro.siit.FinalProject.service.InvoiceServiceImpl;
 import ro.siit.FinalProject.service.SecurityServiceImpl;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -60,7 +62,8 @@ public class InvoiceManagementController implements InvoiceApi {
                                    @RequestParam Double value,
                                    @RequestParam String currency,
                                    @RequestParam String dueDate,
-                                   @RequestParam String paymentStatus) {
+                                   @RequestParam String paymentStatus,
+                                   @RequestParam MultipartFile invoiceImage) {
 
         User user = securityService.getUser();
 
@@ -69,11 +72,18 @@ public class InvoiceManagementController implements InvoiceApi {
         }
 
         Supplier supplier = supplierRepository
-                .findSupplierByUserAndName(user, supplierName)
-                .orElseThrow(ObjectNotFoundException::new);
+                .findSupplierByUserAndName(user, supplierName).orElseThrow(ObjectNotFoundException::new);
 
         Invoice addedInvoice =
                 new Invoice(invoiceNumber, value, currency, LocalDate.parse(dueDate), paymentStatus, supplier);
+
+        if(!invoiceImage.isEmpty()){
+            try {
+                addedInvoice.setInvoiceImage(invoiceImage.getBytes());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
         addedInvoice.setUser(user);
         invoiceRepository.saveAndFlush(addedInvoice);
@@ -98,10 +108,10 @@ public class InvoiceManagementController implements InvoiceApi {
 
         model.addAttribute("invoice", invoice);
 
-        String currentInvoiceSupplierName = invoice.getSupplier().getSupplierName();
+        String currentSupplierName = invoice.getSupplier().getSupplierName();
 
         model.addAttribute("supplierList",
-                supplierRepository.supplierListWithoutCurrentSupplier(securityService.getUser(), currentInvoiceSupplierName));
+                supplierRepository.supplierListWithoutCurrentSupplier(securityService.getUser(), currentSupplierName));
 
         model.addAttribute("availableStatus", invoiceService.getRemainedInvoiceStatusOptions(invoice));
 
@@ -120,20 +130,30 @@ public class InvoiceManagementController implements InvoiceApi {
                                     @RequestParam Double updatedValue,
                                     @RequestParam String updatedCurrency,
                                     @RequestParam String updatedDueDate,
-                                    @RequestParam String updatedStatus) {
+                                    @RequestParam String updatedStatus,
+                                    @RequestParam MultipartFile updatedInvoiceImage) {
+
+        User user = securityService.getUser();
 
         Invoice invoice = invoiceRepository
-                .findInvoiceByNumberAndUser(invoiceNumber, securityService.getUser())
-                .orElseThrow(ObjectNotFoundException::new);
+                .findInvoiceByNumberAndUser(invoiceNumber, user).orElseThrow(ObjectNotFoundException::new);
+
         Supplier updatedSupplier = supplierRepository
-                .findSupplierByUserAndName(securityService.getUser(), updatedSupplierName)
-                .orElseThrow(ObjectNotFoundException::new);
+                .findSupplierByUserAndName(user, updatedSupplierName).orElseThrow(ObjectNotFoundException::new);
 
         invoice.setSupplier(updatedSupplier);
         invoice.setValue(updatedValue);
         invoice.setCurrency(updatedCurrency);
         invoice.setDueDate(LocalDate.parse(updatedDueDate));
         invoice.setStatus(updatedStatus);
+
+        if(!updatedInvoiceImage.isEmpty()){
+            try {
+                invoice.setInvoiceImage(updatedInvoiceImage.getBytes());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
         invoiceRepository.saveAndFlush(invoice);
 
@@ -152,6 +172,18 @@ public class InvoiceManagementController implements InvoiceApi {
     }
 
     @Override
+    public RedirectView deleteImageForInvoice(Model model, @PathVariable String invoiceNumber) {
+
+        Optional<Invoice> invoice = invoiceRepository.findInvoiceByNumberAndUser(invoiceNumber, securityService.getUser());
+
+        invoice.orElseThrow(ObjectNotFoundException::new).setInvoiceImage(null);
+
+        invoiceRepository.saveAndFlush(invoice.get());
+
+        return new RedirectView("/invoiceManagement");
+    }
+
+    @Override
     public String getFilteredInvoices(Model model, @RequestParam String filterParam) {
 
         invoiceService.getInvoiceListWithCustomInputFilter(filterParam, model);
@@ -160,5 +192,16 @@ public class InvoiceManagementController implements InvoiceApi {
         model.addAttribute("currentDate", LocalDate.now());
 
         return "InvoiceManagement/customFilterInvoiceTable";
+    }
+
+    @Override
+    public @ResponseBody byte[] getInvoiceImage(Model model, @PathVariable String invoiceNumber){
+        Optional<Invoice> invoice = invoiceRepository.findInvoiceByNumberAndUser(invoiceNumber, securityService.getUser());
+
+        if(invoice.map(Invoice::getInvoiceImage).orElseThrow(ObjectNotFoundException::new) != null) {
+                return invoice.get().getInvoiceImage();
+            }
+
+            throw new NullPointerException("Selected Invoice does not have a picture assigned.");
     }
 }

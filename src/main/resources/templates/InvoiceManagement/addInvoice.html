@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <title>Add Invoice Form</title>
@@ -32,7 +32,7 @@
 <h1 align="center">Add invoice</h1>
 
 <div class="container">
-<form method="post" th:action="@{addInvoice}">
+<form method="post" th:action="@{addInvoice}" enctype="multipart/form-data">
     <div class="row">
         <div class="col">
             <input type="text" class="form-control" name="invoiceNumber" id="invoiceNumber" required placeholder="Invoice Number">
@@ -72,6 +72,12 @@
                 <option value="Paid">Paid</option>
                 <option value="Not paid">Not Paid</option>
             </select>
+        </div>
+        <div class="row">
+            <div class="container">
+                <label for="invoiceImage" class="form-label">Upload Invoice Image</label>
+                <input id="invoiceImage" class="form-control" type="file" name="invoiceImage" accept="image/png, image/gif, image/jpeg" multiple>
+            </div>
         </div>
     </div>
         <br>

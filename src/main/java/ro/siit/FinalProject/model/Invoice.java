@@ -37,6 +37,9 @@ public class Invoice {
     @Column(name = "status", nullable = false)
     private String status;
 
+    @Column(name ="invoice_image")
+    private byte[] invoiceImage;
+
     public Invoice(String invoiceNumber, Double value, String currency, LocalDate dueDate, String status, Supplier supplier) {
         this.invoiceNumber = invoiceNumber;
         this.value = value;

@@ -16,19 +16,19 @@ public interface SupplierApi {
     String addSupplierForm(Model model);
 
     @PostMapping("/addSupplier")
-    public RedirectView addSupplier(Model model,
+    RedirectView addSupplier(Model model,
                                     @RequestParam String supplierName,
                                     @RequestParam String phoneNumber,
                                     @RequestParam String county);
 
     @GetMapping("/delete/{id}")
-    public RedirectView deleteSupplier(Model model, @PathVariable UUID id);
+    RedirectView deleteSupplier(Model model, @PathVariable UUID id);
 
     @GetMapping("/edit/{id}")
-    public String editSupplierForm(Model model, @PathVariable UUID id);
+    String editSupplierForm(Model model, @PathVariable UUID id);
 
     @PostMapping("/edit")
-    public RedirectView editInvoice(Model model,
+    RedirectView editInvoice(Model model,
                                     @RequestParam UUID supplierId,
                                     @RequestParam String updatedSupplierName,
                                     @RequestParam String updatedPhoneNumber,

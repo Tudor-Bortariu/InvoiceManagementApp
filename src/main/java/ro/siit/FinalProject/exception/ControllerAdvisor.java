@@ -33,4 +33,14 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
         return "Exception/customExceptionPage";
     }
 
+    @ExceptionHandler(NullPointerException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public String handleIllegalArgumentException (NullPointerException ex, Model model){
+        LOGGER.error(ex.getMessage());
+
+        model.addAttribute("exceptionMessage", ex.getMessage());
+
+        return "Exception/customExceptionPage";
+    }
+
 }

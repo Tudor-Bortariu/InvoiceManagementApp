@@ -102,6 +102,7 @@
                         <th scope="col">Payment Status</th>
                         <th scope="col">Action</th>
                         <th scope="col">Mark as Unpaid</th>
+                        <th scope="col">View Invoice Image</th>
                     </tr>
                     </thead>
                         <tbody>
@@ -115,7 +116,7 @@
                                 <td th:text="${invoice.introductionDate}"></td>
                                 <td th:text="${invoice.status}"></td>
                                 <td>
-                                    <a class="btn btn-outline-info" th:href="@{/invoiceManagement/edit/{invoiceNumber}(invoiceNumber=${invoice.invoiceNumber})}"><i class="bi bi-pencil-fill"></i></a>
+                                    <a class="btn btn-outline-primary" th:href="@{/invoiceManagement/edit/{invoiceNumber}(invoiceNumber=${invoice.invoiceNumber})}"><i class="bi bi-pencil-fill"></i></a>
                                     <a class="btn btn-outline-danger" th:href="@{/invoiceManagement/delete/{invoiceNumber}(invoiceNumber=${invoice.invoiceNumber})}"><i class="bi bi-trash"></i></a>
                                 </td>
                                 <td>
@@ -125,6 +126,11 @@
                                     <form method="get" th:action="@{/invoiceManagement/changePaymentStatus/{invoiceNumber}(invoiceNumber=${invoice.invoiceNumber})}" th:unless="${invoice.status == 'Not paid'}">
                                         <button type="submit" name="paymentStatus" value="Not paid" class="btn btn-outline-info">Mark as Unpaid</button>
                                     </form>
+                                </td>
+                                <td>
+                                    <a th:if="${invoice.invoiceImage != null}" class="btn btn-outline-primary" th:href="@{/invoiceManagement/download/{invoiceNumber}(invoiceNumber=${invoice.invoiceNumber})}">View Invoice</a>
+                                    <a th:if="${invoice.invoiceImage != null}" class="btn btn-outline-danger" th:href="@{/invoiceManagement/deleteImage/{invoiceNumber}(invoiceNumber=${invoice.invoiceNumber})}">Delete Image</a>
+                                    <a th:unless="${invoice.invoiceImage != null}" class="btn btn-outline-secondary active">No image available</a>
                                 </td>
                             </tr>
                         </tbody>

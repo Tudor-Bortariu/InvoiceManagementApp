@@ -9,7 +9,7 @@ import ro.siit.FinalProject.model.User;
 @Service
 public class SecurityServiceImpl implements SecurityService{
     @Autowired
-    IAuthenticationFacade authenticationFacade;
+    private IAuthenticationFacade authenticationFacade;
 
     @Override
     public User getUser() {

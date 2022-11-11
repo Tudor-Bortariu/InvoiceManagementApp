@@ -17,14 +17,13 @@ import java.util.stream.Stream;
 @Service
 public class InvoiceServiceImpl implements InvoiceService{
     @Autowired
-    JpaInvoiceRepository invoiceRepository;
+    private JpaInvoiceRepository invoiceRepository;
 
     @Autowired
-    SecurityServiceImpl securityService;
+    private SecurityServiceImpl securityService;
 
     @Autowired
-    JpaSupplierRepository supplierRepository;
-
+    private JpaSupplierRepository supplierRepository;
 
     @Override
     public List<String> getRemainedInvoiceStatusOptions(Invoice invoice) {
