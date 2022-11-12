@@ -16,9 +16,13 @@ import ro.siit.FinalProject.repository.JpaSupplierRepository;
 import ro.siit.FinalProject.service.InvoiceServiceImpl;
 import ro.siit.FinalProject.service.SecurityServiceImpl;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 public class InvoiceManagementController implements InvoiceApi {
@@ -203,5 +207,25 @@ public class InvoiceManagementController implements InvoiceApi {
             }
 
             throw new NullPointerException("Selected Invoice does not have a picture assigned.");
+    }
+
+    @Override
+    public void downloadPdfFile(HttpServletResponse response, @RequestParam String filter, @RequestParam String supplierName) throws IOException {
+
+        response.setContentType("application/pdf");
+
+        String headerKey = "Content-Disposition";
+        String headerValue = "attachment; filename=pdf_" +
+                securityService.getUser().getFirstName() +
+                "_" + securityService.getUser().getLastName() +
+                "_" + LocalDateTime.now() + ".pdf";
+        response.setHeader(headerKey, headerValue);
+
+        List<Invoice> invoiceList = invoiceService.getPdfInvoiceList_WithCustomInputFilter(filter)
+                .stream()
+                .filter(invoice -> invoice.getSupplier().getSupplierName().contains(supplierName.toUpperCase()))
+                .collect(Collectors.toList());
+
+        invoiceService.generatePdf(response, invoiceList);
     }
 }

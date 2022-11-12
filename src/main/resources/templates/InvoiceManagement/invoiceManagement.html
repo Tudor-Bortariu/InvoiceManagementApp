@@ -41,26 +41,26 @@
             <span class="filterLabel">Filter Invoice Table: </span>
         </div>
         <div class="col-md-auto" style="margin: 2px -10px;">
-            <a class="btn btn-primary" th:href="@{/invoiceManagement}" style="background-color: #1E90FF;">View all</a>
+            <a class="btn btn-primary" th:href="@{/invoiceManagement}">View all</a>
         </div>
         <div class="col-md-auto" style="margin: 2px -10px;">
             <form method="get" action="invoiceManagement/filteredInvoiceTable">
-                <button type="submit" name="filterParam" value="Paid" class="btn btn-primary" style="background-color: #1E90FF;">View Paid Invoices</button>
+                <button type="submit" name="filterParam" value="Paid" class="btn btn-primary">View Paid Invoices</button>
             </form>
         </div>
         <div class="col-md-auto" style="margin: 2px -10px;">
             <form method="get" action="invoiceManagement/filteredInvoiceTable">
-                <button type="submit" name="filterParam" value="Not paid" class="btn btn-primary" style="background-color: #1E90FF;">View Unpaid Invoices</button>
+                <button type="submit" name="filterParam" value="Not paid" class="btn btn-primary">View Unpaid Invoices</button>
             </form>
         </div>
         <div class="col-md-auto" style="margin: 2px -10px;">
             <form method="get" action="invoiceManagement/filteredInvoiceTable">
-                <button type="submit" name="filterParam" value="7" class="btn btn-primary" style="background-color: #1E90FF;">Due in 7 Days</button>
+                <button type="submit" name="filterParam" value="7" class="btn btn-primary">Due in 7 Days</button>
             </form>
         </div>
         <div class="col-md-auto" style="margin: 2px -10px;">
             <form method="get" action="invoiceManagement/filteredInvoiceTable">
-                <button type="submit" name="filterParam" value="30" class="btn btn-primary" style="background-color: #1E90FF;">Due in 30 Days</button>
+                <button type="submit" name="filterParam" value="30" class="btn btn-primary">Due in 30 Days</button>
             </form>
         </div>
         <div class="col" style="margin: 2px 0px; text-align: right;">
@@ -70,13 +70,31 @@
 </div>
 
     <div class="container">
-        <div class="input-group" style="margin: 10px 0;">
-            <div class="input-group-prepend">
-                <span class="input-group-text">Filter by Supplier</span>
+        <form method="get" th:action="@{/invoiceManagement/download}">
+        <div class="row">
+            <div class="col">
+                <div class="input-group" style="margin: 10px 0;">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Filter by Supplier</span>
+                    </div>
+                    <input type="text" class="form-control" id="supplierInput" name="supplierName" onkeyup="filterBySupplierName()" placeholder="Write Supplier Name..">
+                </div>
             </div>
-            <input type="text" class="form-control" id="supplierInput" onkeyup="filterBySupplierName()" placeholder="Write Supplier Name..">
+                    <div class="col" style="margin: 10px 0;">
+                        <select name="filter" id="filter" class="form-control" onchange="changeFilter()">
+                            <option value="All">All Invoices</option>
+                            <option value="Paid">Paid Invoices</option>
+                            <option value="Not paid">Unpaid Invoices</option>
+                            <option value="7">Invoices Due in 7 Days</option>
+                            <option value="30">Invoices Due in 30 Days</option>
+                        </select>
+                    </div>
+                    <div class="col" style="margin: 10px 0;">
+                        <button type="submit" value="Export Invoices" class="btn btn-success" style="background-color: #04AA6D;">Export to PDF</button>
+                    </div>
         </div>
-    </div>
+            </form>
+            </div>
 
 <div class="container">
     <p id="colorExplanation"><span id="colorSample">A</span> - Invoice is Not paid and Overdue.</p>
@@ -121,7 +139,7 @@
                         </form>
                     </td>
                     <td>
-                        <a th:if="${invoice.invoiceImage != null}" class="btn btn-outline-primary" th:href="@{/invoiceManagement/download/{invoiceNumber}(invoiceNumber=${invoice.invoiceNumber})}">View Invoice</a>
+                        <a th:if="${invoice.invoiceImage != null}" class="btn btn-outline-primary" th:href="@{/invoiceManagement/viewImage/{invoiceNumber}(invoiceNumber=${invoice.invoiceNumber})}">View Invoice</a>
                         <a th:if="${invoice.invoiceImage != null}" class="btn btn-outline-danger" th:href="@{/invoiceManagement/deleteImage/{invoiceNumber}(invoiceNumber=${invoice.invoiceNumber})}">Delete Image</a>
                         <a th:unless="${invoice.invoiceImage != null}" class="btn btn-outline-secondary active">No image available</a>
                     </td>

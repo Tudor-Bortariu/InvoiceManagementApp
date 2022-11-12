@@ -1,12 +1,15 @@
 package ro.siit.FinalProject.api;
 
+import com.lowagie.text.Document;
 import org.springframework.http.MediaType;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.view.RedirectView;
 
+import javax.servlet.http.HttpServletResponse;
 import java.awt.*;
+import java.io.IOException;
 
 @RequestMapping("invoiceManagement")
 public interface InvoiceApi {
@@ -52,6 +55,9 @@ public interface InvoiceApi {
     @GetMapping("/deleteImage/{invoiceNumber}")
     RedirectView deleteImageForInvoice(Model model, @PathVariable String invoiceNumber);
 
-    @GetMapping(value = "/download/{invoiceNumber}", produces = MediaType.IMAGE_JPEG_VALUE)
+    @GetMapping(value = "/viewImage/{invoiceNumber}", produces = MediaType.IMAGE_JPEG_VALUE)
     @ResponseBody byte[] getInvoiceImage(Model model, @PathVariable String invoiceNumber);
+
+    @GetMapping("/download")
+    void downloadPdfFile (HttpServletResponse response, @RequestParam String filter, @RequestParam String supplierName) throws IOException;
 }
