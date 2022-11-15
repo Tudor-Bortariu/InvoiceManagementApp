@@ -16,7 +16,5 @@ public interface InvoiceService {
     void getInvoiceListWithCustomInputFilter(String filterParam, Model model);
     List<Invoice> getPdfInvoiceList_WithCustomInputFilter(String filter);
     void checkIfSupplierExistsForUser(Supplier supplier);
-    Document generatePdfDocument(List<Invoice> invoiceList);
-
     void generatePdf(HttpServletResponse response, List<Invoice> invoiceList) throws IOException;
 }

@@ -216,9 +216,7 @@ public class InvoiceManagementController implements InvoiceApi {
 
         String headerKey = "Content-Disposition";
         String headerValue = "attachment; filename=pdf_" +
-                securityService.getUser().getFirstName() +
-                "_" + securityService.getUser().getLastName() +
-                "_" + LocalDateTime.now() + ".pdf";
+                filter + "_" + LocalDateTime.now() + ".pdf";
         response.setHeader(headerKey, headerValue);
 
         List<Invoice> invoiceList = invoiceService.getPdfInvoiceList_WithCustomInputFilter(filter)
