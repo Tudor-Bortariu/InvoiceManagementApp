@@ -45,9 +45,9 @@ public class SupplierManagementController implements SupplierApi {
                                     @RequestParam String phoneNumber,
                                     @RequestParam String county) {
 
-        Supplier addedSupplier = new Supplier(UUID.randomUUID(), supplierName, phoneNumber, county);
+        invoiceService.checkIfSupplierExistsForUser(supplierName);
 
-        invoiceService.checkIfSupplierExistsForUser(addedSupplier);
+        Supplier addedSupplier = new Supplier(UUID.randomUUID(), supplierName, phoneNumber, county);
 
         addedSupplier.setUser(securityService.getUser());
 

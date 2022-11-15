@@ -67,11 +67,10 @@ public class InvoiceServiceImpl implements InvoiceService{
     }
 
     @Override
-    public void checkIfSupplierExistsForUser(Supplier supplier){
+    public void checkIfSupplierExistsForUser(String supplierName){
         User user = securityService.getUser();
-        String supplierName = supplier.getSupplierName().toUpperCase();
 
-        if(supplierRepository.findSupplierByUserAndName(user, supplierName).isPresent()){
+        if(supplierRepository.findSupplierByUserAndName(user, supplierName.toUpperCase()).isPresent()){
             throw new IllegalArgumentException("Supplier name already exists. Please insert a different name for the Supplier.");
         }
     }

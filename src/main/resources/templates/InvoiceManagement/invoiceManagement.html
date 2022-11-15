@@ -135,7 +135,7 @@
                             <button type="submit" name="paymentStatus" value="Paid" class="btn btn-success" style="background-color: #04AA6D;">Mark as Paid</button>
                         </form>
                         <form method="get" th:action="@{/invoiceManagement/changePaymentStatus/{invoiceNumber}(invoiceNumber=${invoice.invoiceNumber})}" th:unless="${invoice.status == 'Not paid'}">
-                            <button type="submit" name="paymentStatus" value="Not paid" class="btn btn-outline-success">Mark as Unpaid</button>
+                            <button type="submit" name="paymentStatus" value="Not paid" class="btn btn-outline-danger">Mark as Unpaid</button>
                         </form>
                     </td>
                     <td>

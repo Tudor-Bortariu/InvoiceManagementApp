@@ -28,7 +28,8 @@ public class SecurityController implements SecurityApi {
     @Override
     public String sendRegistrationForm (Model model,
                                         @RequestParam String username,
-                                        @RequestParam("passwordCheck") String password,
+                                        @RequestParam("initialPassword") String initialPassword,
+                                        @RequestParam("passwordCheck") String passwordCheck,
                                         @RequestParam String firstName,
                                         @RequestParam String lastName,
                                         @RequestParam String email){
@@ -36,12 +37,16 @@ public class SecurityController implements SecurityApi {
         if(userRepository.findByUsername(username).isPresent()) {
             throw new IllegalArgumentException("Username is not available. Please insert a different Username.");
         } else {
+            if(!initialPassword.equals(passwordCheck)){
+                throw new IllegalArgumentException("Passwords are not matching. Please make sure you complete the passwords correctly.");
+            }
+
             User user = new User();
             user.setId(UUID.randomUUID());
             user.setUsername(username);
             user.setFirstName(firstName);
             user.setLastName(lastName);
-            user.setPassword(securityConfig.passwordEncoder().encode(password));
+            user.setPassword(securityConfig.passwordEncoder().encode(passwordCheck));
             user.setEmail(email);
 
             userRepository.saveAndFlush(user);

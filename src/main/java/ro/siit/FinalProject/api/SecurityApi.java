@@ -13,7 +13,8 @@ public interface SecurityApi {
     @PostMapping("/register")
     String sendRegistrationForm (Model model,
                                         @RequestParam String username,
-                                 @RequestParam("passwordCheck") String password,
+                                 @RequestParam("initialPassword") String initialPassword,
+                                 @RequestParam("passwordCheck") String passwordCheck,
                                  @RequestParam String firstName,
                                  @RequestParam String lastName,
                                  @RequestParam String email);
