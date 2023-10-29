@@ -1,5 +1,6 @@
 package ro.siit.FinalProject.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,8 +17,8 @@ import ro.siit.FinalProject.repository.JpaSupplierRepository;
 import ro.siit.FinalProject.service.InvoiceServiceImpl;
 import ro.siit.FinalProject.service.SecurityServiceImpl;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -78,8 +79,14 @@ public class InvoiceManagementController implements InvoiceApi {
         Supplier supplier = supplierRepository
                 .findSupplierByUserAndName(user, supplierName).orElseThrow(ObjectNotFoundException::new);
 
-        Invoice addedInvoice =
-                new Invoice(invoiceNumber, value, currency, LocalDate.parse(dueDate), paymentStatus, supplier);
+        Invoice addedInvoice = new Invoice();
+
+        addedInvoice.setInvoiceNumber(invoiceNumber);
+        addedInvoice.setValue(value);
+        addedInvoice.setCurrency(currency);
+        addedInvoice.setDueDate(LocalDate.parse(dueDate));
+        addedInvoice.setStatus(paymentStatus);
+        addedInvoice.setSupplier(supplier);
 
         if(!invoiceImage.isEmpty()){
             try {
@@ -205,6 +212,10 @@ public class InvoiceManagementController implements InvoiceApi {
         if(invoice.map(Invoice::getInvoiceImage).orElseThrow(ObjectNotFoundException::new) != null) {
                 return invoice.get().getInvoiceImage();
             }
+
+        BigInteger integer = new BigInteger("3");
+        StringBuilder string = new StringBuilder();
+        string.append(1);
 
             throw new NullPointerException("Selected Invoice does not have a picture assigned.");
     }

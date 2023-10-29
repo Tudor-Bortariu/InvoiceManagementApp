@@ -1,17 +1,33 @@
 package ro.siit.FinalProject.model;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
-import javax.persistence.*;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "invoices")
-@NoArgsConstructor @Setter @Getter
+@NoArgsConstructor
+@Setter
+@Getter
 public class Invoice {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
     @Column(name = "invoice_number", nullable = false)
     private String invoiceNumber;
 
@@ -24,13 +40,15 @@ public class Invoice {
     @Column(name = "due_date", nullable = false)
     private LocalDate dueDate;
 
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "introduction_date", nullable = false)
-    private LocalDate introductionDate;
+    private Timestamp introductionDate;
 
     @ManyToOne
     private Supplier supplier;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
@@ -39,14 +57,4 @@ public class Invoice {
 
     @Column(name ="invoice_image")
     private byte[] invoiceImage;
-
-    public Invoice(String invoiceNumber, Double value, String currency, LocalDate dueDate, String status, Supplier supplier) {
-        this.invoiceNumber = invoiceNumber;
-        this.value = value;
-        this.currency = currency;
-        this.dueDate = dueDate;
-        this.introductionDate = LocalDate.now();
-        this.status = status;
-        this.supplier = supplier;
-    }
 }

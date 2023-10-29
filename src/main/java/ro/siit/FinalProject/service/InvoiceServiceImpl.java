@@ -2,16 +2,15 @@ package ro.siit.FinalProject.service;
 
 import com.lowagie.text.*;
 import com.lowagie.text.pdf.*;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import ro.siit.FinalProject.model.Invoice;
-import ro.siit.FinalProject.model.Supplier;
 import ro.siit.FinalProject.model.User;
 import ro.siit.FinalProject.repository.JpaInvoiceRepository;
 import ro.siit.FinalProject.repository.JpaSupplierRepository;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;

@@ -1,19 +1,27 @@
 package ro.siit.FinalProject.model;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
-import java.util.List;
+import javax.validation.constraints.Email;
 import java.util.UUID;
 
 @Entity
 @Table(name = "users")
-@NoArgsConstructor @Setter @Getter
+@NoArgsConstructor
+@Setter
+@Getter
 public class User {
+
     @Id
-    @Column(name = "user_id")
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(nullable = false, unique = true, length = 32)
@@ -30,12 +38,4 @@ public class User {
 
     @Column(nullable = false)
     private String email;
-
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL)
-    private List<Invoice> invoices;
-
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL)
-    private List<Supplier> suppliers;
 }

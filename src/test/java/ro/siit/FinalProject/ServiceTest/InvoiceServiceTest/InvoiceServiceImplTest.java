@@ -18,7 +18,7 @@ class InvoiceServiceImplTest {
     @Autowired
     private InvoiceServiceImpl invoiceService;
 
-    Invoice invoice = new Invoice("invoiceNumber", 200.0, "RON", LocalDate.now(), "Paid", new Supplier());
+    Invoice invoice = new Invoice();
 
     @Test
     public void getRemainedInvoice_StatusOptionsTest(){
