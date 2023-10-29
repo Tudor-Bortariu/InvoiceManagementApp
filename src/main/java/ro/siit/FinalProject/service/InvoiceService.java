@@ -1,11 +1,9 @@
 package ro.siit.FinalProject.service;
 
-import com.lowagie.text.Document;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.ui.Model;
 import ro.siit.FinalProject.model.Invoice;
-import ro.siit.FinalProject.model.Supplier;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 

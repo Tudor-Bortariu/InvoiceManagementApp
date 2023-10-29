@@ -47,7 +47,10 @@ public class SupplierManagementController implements SupplierApi {
 
         invoiceService.checkIfSupplierExistsForUser(supplierName);
 
-        Supplier addedSupplier = new Supplier(UUID.randomUUID(), supplierName, phoneNumber, county);
+        Supplier addedSupplier = new Supplier();
+
+        addedSupplier.setSupplierName(supplierName);
+        addedSupplier.setPhoneNumber(phoneNumber);
 
         addedSupplier.setUser(securityService.getUser());
 
@@ -77,13 +80,12 @@ public class SupplierManagementController implements SupplierApi {
                                     @RequestParam String updatedPhoneNumber,
                                     @RequestParam String updatedCounty) {
 
-        Optional<Supplier> supplier = supplierRepository.findById(supplierId);
+        Supplier supplier = supplierRepository.findById(supplierId).orElseThrow(ObjectNotFoundException::new);
 
-        supplier.orElseThrow(ObjectNotFoundException::new).setSupplierName(updatedSupplierName);
-        supplier.get().setPhoneNumber(updatedPhoneNumber);
-        supplier.get().setCounty(updatedCounty);
+        supplier.setSupplierName(updatedSupplierName);
+        supplier.setPhoneNumber(updatedPhoneNumber);
 
-        supplierRepository.saveAndFlush(supplier.get());
+        supplierRepository.saveAndFlush(supplier);
 
         return new RedirectView("/supplierManagement");
     }
