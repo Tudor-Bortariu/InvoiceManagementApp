@@ -1,7 +1,6 @@
 package ro.siit.FinalProject.exception;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -10,13 +9,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @ControllerAdvice
+@Slf4j
 public class ControllerAdvisor extends ResponseEntityExceptionHandler {
-    private static final Logger LOGGER = LogManager.getLogger();
 
     @ExceptionHandler(ObjectNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleObjectNotFoundException (ObjectNotFoundException ex, Model model){
-        LOGGER.error(ex.getMessage());
+        log.error(ex.getMessage());
 
         model.addAttribute("exceptionMessage", ex.getMessage());
 
@@ -24,9 +23,9 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleIllegalArgumentException (IllegalArgumentException ex, Model model){
-        LOGGER.error(ex.getMessage());
+        log.error(ex.getMessage());
 
         model.addAttribute("exceptionMessage", ex.getMessage());
 
@@ -34,9 +33,9 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(NullPointerException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleIllegalArgumentException (NullPointerException ex, Model model){
-        LOGGER.error(ex.getMessage());
+        log.error(ex.getMessage());
 
         model.addAttribute("exceptionMessage", ex.getMessage());
 

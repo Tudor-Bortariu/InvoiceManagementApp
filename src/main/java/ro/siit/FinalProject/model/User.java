@@ -10,7 +10,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.constraints.Email;
 import java.util.UUID;
 
 @Entity
@@ -24,10 +23,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false, unique = true, length = 32)
+    @Column(nullable = false, unique = true)
     private String username;
 
-    @Column(nullable = false, length = 64)
+    @Column(nullable = false)
     private String password;
 
     @Column (nullable = false)
@@ -36,6 +35,6 @@ public class User {
     @Column (nullable = false)
     private String lastName;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 }

@@ -1,31 +1,25 @@
 package ro.siit.FinalProject.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import ro.siit.FinalProject.api.HomeApi;
-import ro.siit.FinalProject.model.CustomUserDetails;
-import ro.siit.FinalProject.model.User;
-import ro.siit.FinalProject.service.IAuthenticationFacade;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
+import ro.siit.FinalProject.service.SecurityService;
 
-@Controller
-public class HomeController implements HomeApi {
+@RestController
+@RequestMapping("/home")
+@RequiredArgsConstructor
+public class HomeController{
+    private final SecurityService securityService;
 
-    @Autowired
-    private IAuthenticationFacade authenticationFacade;
-
-    @Override
-    public String homePage(Model model) {
-        Authentication authentication = authenticationFacade.getAuthentication();
-
-        if (!(authentication instanceof AnonymousAuthenticationToken)){
-            User user = ((CustomUserDetails) authentication.getPrincipal()).getUser();
-
-            model.addAttribute("userFirstName", user.getFirstName());
+    @GetMapping
+    public ModelAndView homePage() {
+        ModelAndView modelAndView = new ModelAndView("HomePage/home");
+        //TODO (TUDOR): Insert Short User DTO for FE info on homepage
+        if(securityService.isAuthenticated()) {
+            modelAndView.addObject("userFirstName", securityService.getAuthenticatedUser().getFirstName());
         }
-
-        return "HomePage/home";
+        return modelAndView;
     }
 }

@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS invoices (
     status varchar(50) NOT NULL,
     invoice_image bytea,
     CONSTRAINT PK_invoices_id PRIMARY KEY (id, invoice_number),
-    CONSTRAINT UK_invoices_invoice_number UNIQUE (invoice_number),
+    CONSTRAINT UK_invoices_invoice_number UNIQUE (invoice_number, user_id, supplier_id),
     CONSTRAINT UK_invoices_invoice_image UNIQUE (invoice_image),
     CONSTRAINT FK_invoices_suppliers_supplier_id FOREIGN KEY (supplier_id) REFERENCES "public".suppliers (id),
     CONSTRAINT FK_invoices_users_user_id FOREIGN KEY (user_id) REFERENCES "public".users (id)

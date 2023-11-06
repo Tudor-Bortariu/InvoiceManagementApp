@@ -1,86 +1,82 @@
 package ro.siit.FinalProject.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.view.RedirectView;
-import ro.siit.FinalProject.api.InvoiceApi;
+import org.springframework.web.servlet.ModelAndView;
 import ro.siit.FinalProject.exception.ObjectNotFoundException;
 import ro.siit.FinalProject.model.Invoice;
 import ro.siit.FinalProject.model.Supplier;
 import ro.siit.FinalProject.model.User;
-import ro.siit.FinalProject.repository.JpaInvoiceRepository;
-import ro.siit.FinalProject.repository.JpaSupplierRepository;
-import ro.siit.FinalProject.service.InvoiceServiceImpl;
-import ro.siit.FinalProject.service.SecurityServiceImpl;
+import ro.siit.FinalProject.repository.SupplierRepository;
+import ro.siit.FinalProject.service.InvoiceService;
+import ro.siit.FinalProject.service.SecurityService;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Controller
-public class InvoiceManagementController implements InvoiceApi {
-    @Autowired
-    private InvoiceServiceImpl invoiceService;
+@RestController
+@RequestMapping("/invoice-management")
+@RequiredArgsConstructor
+public class InvoiceManagementController{
+    private final InvoiceService invoiceService;
+    private final SecurityService securityService;
+    private final SupplierRepository supplierRepository;
 
-    @Autowired
-    private SecurityServiceImpl securityService;
-
-    @Autowired
-    private JpaSupplierRepository supplierRepository;
-
-    @Autowired
-    private JpaInvoiceRepository invoiceRepository;
-
-    @Override
-    public String invoiceManagement(Model model) {
-
-        model.addAttribute("invoices", invoiceRepository.findAllInvoicesByUser(securityService.getUser()));
-        model.addAttribute("suppliers", supplierRepository.findAllSuppliersByUser(securityService.getUser()));
-        model.addAttribute("currentDate", LocalDate.now());
-
-        return "InvoiceManagement/invoiceManagement";
+    @GetMapping
+    public ModelAndView getInvoiceManagementView() {
+        ModelAndView modelAndView = new ModelAndView("InvoiceManagement/invoiceManagement");
+        modelAndView.addObject("invoices", invoiceService.findByUser_OrderByIntroductionDateDesc(securityService.getAuthenticatedUser()));
+        modelAndView.addObject("suppliers", supplierRepository.findByUser_OrderBySupplierNameAsc(securityService.getAuthenticatedUser()));
+        modelAndView.addObject("currentDate", LocalDate.now());
+        return modelAndView;
     }
 
-    @Override
-    public String addInvoiceForm(Model model) {
-
-        model.addAttribute("supplierList", supplierRepository.findAllSuppliersByUser(securityService.getUser()));
-        model.addAttribute("currentDate", LocalDate.now());
-        model.addAttribute("minDate", LocalDate.now().minusYears(1));
-        model.addAttribute("maxDate", LocalDate.now().plusYears(2));
-
-        return "InvoiceManagement/addInvoice";
+    @GetMapping("/form")
+    public ModelAndView getInvoicePostForm() {
+        ModelAndView modelAndView = new ModelAndView("InvoiceManagement/addInvoice");
+        modelAndView.addObject("supplierList", supplierRepository.findByUser_OrderBySupplierNameAsc(securityService.getAuthenticatedUser()));
+        modelAndView.addObject("currentDate", LocalDate.now());
+        modelAndView.addObject("minDate", LocalDate.now().minusYears(1));
+        modelAndView.addObject("maxDate", LocalDate.now().plusYears(2));
+        return modelAndView;
     }
 
-    @Override
-    public RedirectView addInvoice(Model model,
-                                   @RequestParam String invoiceNumber,
-                                   @RequestParam String supplierName,
-                                   @RequestParam Double value,
-                                   @RequestParam String currency,
-                                   @RequestParam String dueDate,
-                                   @RequestParam String paymentStatus,
-                                   @RequestParam MultipartFile invoiceImage) {
+    @PostMapping
+    public ResponseEntity<Invoice> addInvoice(@RequestParam String invoiceNumber,
+                                              @RequestParam String supplierName,
+                                              @RequestParam Double value,
+                                              @RequestParam String currency,
+                                              @RequestParam String dueDate,
+                                              @RequestParam String paymentStatus,
+                                              @RequestParam MultipartFile invoiceImage) {
 
-        User user = securityService.getUser();
+        User user = securityService.getAuthenticatedUser();
 
-        if (invoiceRepository.findInvoiceByNumberAndUser(invoiceNumber, user).isPresent()) {
+        if (invoiceService.findByInvoiceNumber_AndUser(invoiceNumber, user) != null) {
             throw new IllegalArgumentException("Invoice number already exists in this database. Please insert a different number for the Invoice.");
         }
 
         Supplier supplier = supplierRepository
-                .findSupplierByUserAndName(user, supplierName).orElseThrow(ObjectNotFoundException::new);
+                .findByUser_AndSupplierName(user, supplierName).orElseThrow(ObjectNotFoundException::new);
 
         Invoice addedInvoice = new Invoice();
-
         addedInvoice.setInvoiceNumber(invoiceNumber);
         addedInvoice.setValue(value);
         addedInvoice.setCurrency(currency);
@@ -97,46 +93,36 @@ public class InvoiceManagementController implements InvoiceApi {
         }
 
         addedInvoice.setUser(user);
-        invoiceRepository.saveAndFlush(addedInvoice);
-
-
-        return new RedirectView("/invoiceManagement");
+        return new ResponseEntity<>(invoiceService.saveInvoice(addedInvoice), HttpStatus.CREATED);
     }
 
-    @Override
-    public RedirectView deleteInvoice(Model model, @PathVariable String invoiceNumber) {
-        invoiceRepository.deleteByInvoiceNumber(invoiceNumber);
-        return new RedirectView("/invoiceManagement");
+    @DeleteMapping("/{invoiceNumber}")
+    public ResponseEntity<String> deleteInvoice(@PathVariable String invoiceNumber) {
+        invoiceService.deleteByInvoiceNumber(invoiceNumber);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 
-    @Override
-    public String editInvoiceForm(Model model, @PathVariable String invoiceNumber) {
+    @GetMapping("/{invoiceNumber}/form")
+    public ModelAndView getInvoiceUpdateForm(@PathVariable String invoiceNumber) {
+        ModelAndView modelAndView = new ModelAndView("InvoiceManagement/editForm");
+        Invoice invoice = invoiceService.findByInvoiceNumber_AndUser(invoiceNumber, securityService.getAuthenticatedUser());
 
-        Invoice invoice = invoiceRepository
-                .findInvoiceByNumberAndUser(invoiceNumber, securityService.getUser())
-                .orElseThrow(ObjectNotFoundException::new);
-
-        model.addAttribute("invoice", invoice);
+        modelAndView.addObject("invoice", invoice);
 
         String currentSupplierName = invoice.getSupplier().getSupplierName();
 
-        model.addAttribute("supplierList",
-                supplierRepository.supplierListWithoutCurrentSupplier(securityService.getUser(), currentSupplierName));
-
-        model.addAttribute("availableStatus", invoiceService.getRemainedInvoiceStatusOptions(invoice));
-
-        model.addAttribute("currencyList", invoiceService.getRemainedInvoiceCurrencyOptions(invoice));
-
-        model.addAttribute("minDate", LocalDate.now().minusYears(1));
-        model.addAttribute("maxDate", LocalDate.now().plusYears(2));
-
-        return "InvoiceManagement/editForm";
+        modelAndView.addObject("supplierList",
+                supplierRepository.findByUser_AndSupplierName_OrderBySupplierNameAsc(securityService.getAuthenticatedUser(), currentSupplierName));
+        modelAndView.addObject("availableStatus", invoiceService.getRemainedInvoiceStatusOptions(invoice));
+        modelAndView.addObject("currencyList", invoiceService.getRemainedInvoiceCurrencyOptions(invoice));
+        modelAndView.addObject("minDate", LocalDate.now().minusYears(1));
+        modelAndView.addObject("maxDate", LocalDate.now().plusYears(2));
+        return modelAndView;
     }
 
-    @Override
-    public RedirectView editInvoice(Model model,
-                                    @RequestParam String invoiceNumber,
+    @PutMapping("/{invoiceNumber}")
+    public ResponseEntity<Invoice> editInvoice(@RequestParam String invoiceNumber,
                                     @RequestParam String updatedSupplierName,
                                     @RequestParam Double updatedValue,
                                     @RequestParam String updatedCurrency,
@@ -144,20 +130,16 @@ public class InvoiceManagementController implements InvoiceApi {
                                     @RequestParam String updatedStatus,
                                     @RequestParam MultipartFile updatedInvoiceImage) {
 
-        User user = securityService.getUser();
+        User user = securityService.getAuthenticatedUser();
 
-        Invoice invoice = invoiceRepository
-                .findInvoiceByNumberAndUser(invoiceNumber, user).orElseThrow(ObjectNotFoundException::new);
-
+        Invoice invoice = invoiceService.findByInvoiceNumber_AndUser(invoiceNumber, user);
         Supplier updatedSupplier = supplierRepository
-                .findSupplierByUserAndName(user, updatedSupplierName).orElseThrow(ObjectNotFoundException::new);
-
+                .findByUser_AndSupplierName(user, updatedSupplierName).orElseThrow(ObjectNotFoundException::new);
         invoice.setSupplier(updatedSupplier);
         invoice.setValue(updatedValue);
         invoice.setCurrency(updatedCurrency);
         invoice.setDueDate(LocalDate.parse(updatedDueDate));
         invoice.setStatus(updatedStatus);
-
         if(!updatedInvoiceImage.isEmpty()){
             try {
                 invoice.setInvoiceImage(updatedInvoiceImage.getBytes());
@@ -165,64 +147,52 @@ public class InvoiceManagementController implements InvoiceApi {
                 throw new RuntimeException(e);
             }
         }
-
-        invoiceRepository.saveAndFlush(invoice);
-
-        return new RedirectView("/invoiceManagement");
+        invoiceService.saveInvoice(invoice);
+        return new ResponseEntity<>(invoice, HttpStatus.OK);
     }
 
-    @Override
-    public RedirectView changePaymentStatus(Model model, @PathVariable String invoiceNumber, @RequestParam String paymentStatus) {
-
-        Optional<Invoice> invoice = invoiceRepository.findInvoiceByNumberAndUser(invoiceNumber, securityService.getUser());
-
-        invoice.orElseThrow(ObjectNotFoundException::new).setStatus(paymentStatus);
-        invoiceRepository.saveAndFlush(invoice.get());
-
-        return new RedirectView("/invoiceManagement");
+    @PatchMapping("/{invoiceNumber}")
+    public ResponseEntity<Invoice> changePaymentStatus(@PathVariable String invoiceNumber) {
+        Invoice invoice = invoiceService.findByInvoiceNumber_AndUser(invoiceNumber, securityService.getAuthenticatedUser());
+        if(invoice.getStatus().equals("Not paid")) {
+            invoice.setStatus("Paid");
+        } else {
+            invoice.setStatus("Not paid");
+        }
+        invoiceService.saveInvoice(invoice);
+        return new ResponseEntity<>(invoice, HttpStatus.OK);
     }
 
-    @Override
-    public RedirectView deleteImageForInvoice(Model model, @PathVariable String invoiceNumber) {
-
-        Optional<Invoice> invoice = invoiceRepository.findInvoiceByNumberAndUser(invoiceNumber, securityService.getUser());
-
-        invoice.orElseThrow(ObjectNotFoundException::new).setInvoiceImage(null);
-
-        invoiceRepository.saveAndFlush(invoice.get());
-
-        return new RedirectView("/invoiceManagement");
+    @DeleteMapping("/{invoiceNumber}/resources")
+    public ResponseEntity<Invoice> deleteImageForInvoice(Model model, @PathVariable String invoiceNumber) {
+        Invoice invoice = invoiceService.findByInvoiceNumber_AndUser(invoiceNumber, securityService.getAuthenticatedUser());
+        invoice.setInvoiceImage(null);
+        invoiceService.saveInvoice(invoice);
+        return new ResponseEntity<>(invoice, HttpStatus.OK);
     }
 
-    @Override
-    public String getFilteredInvoices(Model model, @RequestParam String filterParam) {
+    @GetMapping("/invoices/filter")
+    public ModelAndView getFilteredInvoicesView(@RequestParam String filterParam) {
+        ModelAndView modelAndView = new ModelAndView("InvoiceManagement/customFilterInvoiceTable");
+        invoiceService.getInvoiceListWithCustomInputFilter(filterParam, modelAndView);
 
-        invoiceService.getInvoiceListWithCustomInputFilter(filterParam, model);
+        modelAndView.addObject("filterParam", filterParam);
+        modelAndView.addObject("currentDate", LocalDate.now());
 
-        model.addAttribute("filterParam", filterParam);
-        model.addAttribute("currentDate", LocalDate.now());
-
-        return "InvoiceManagement/customFilterInvoiceTable";
+        return modelAndView;
     }
 
-    @Override
+    @GetMapping("/{invoiceNumber}/resources")
     public @ResponseBody byte[] getInvoiceImage(Model model, @PathVariable String invoiceNumber){
-        Optional<Invoice> invoice = invoiceRepository.findInvoiceByNumberAndUser(invoiceNumber, securityService.getUser());
-
-        if(invoice.map(Invoice::getInvoiceImage).orElseThrow(ObjectNotFoundException::new) != null) {
-                return invoice.get().getInvoiceImage();
+        Invoice invoice = invoiceService.findByInvoiceNumber_AndUser(invoiceNumber, securityService.getAuthenticatedUser());
+        if(invoice.getInvoiceImage() != null) {
+                return invoice.getInvoiceImage();
             }
-
-        BigInteger integer = new BigInteger("3");
-        StringBuilder string = new StringBuilder();
-        string.append(1);
-
-            throw new NullPointerException("Selected Invoice does not have a picture assigned.");
+        throw new NullPointerException("Selected Invoice does not have a picture assigned.");
     }
 
-    @Override
+    @GetMapping("/invoices/download")
     public void downloadPdfFile(HttpServletResponse response, @RequestParam String filter, @RequestParam String supplierName) throws IOException {
-
         response.setContentType("application/pdf");
 
         String headerKey = "Content-Disposition";

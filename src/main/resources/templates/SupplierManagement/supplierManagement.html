@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -24,10 +24,10 @@
 
             <div class="topnav">
                 <a class="nav-link" href="">Menu</a>
-                <a class="nav-item nav-link" th:href="@{/}">To Home Page</a>
-                <a class="nav-item nav-link" th:href="@{/invoiceManagement}">My Invoices</a>
-                <a class="nav-item nav-link" th:href="@{/invoiceManagement/addInvoice}">Add new invoice</a>
-                <a class="nav-item nav-link" th:href="@{/logoutConfirm}" sec:authorize="isAuthenticated()">Logout</a>
+                <a class="nav-item nav-link" th:href="@{/home}">To Home Page</a>
+                <a class="nav-item nav-link" th:href="@{/invoice-management}">My Invoices</a>
+                <a class="nav-item nav-link" th:href="@{/invoice-management/form}">Add new invoice</a>
+                <a class="nav-item nav-link" th:href="@{/logout-confirmation}" sec:authorize="isAuthenticated()">Logout</a>
             </div>
 
         </div>
@@ -47,7 +47,7 @@
                 </div>
             </div>
             <div class="col-md-auto">
-                <a class="btn btn-success" th:href="@{/supplierManagement/addSupplier}" style="background-color: #04AA6D; margin: 10px 0px;">Add new Supplier</a>
+                <a class="btn btn-success" th:href="@{/supplier-management/form}" style="background-color: #04AA6D; margin: 10px 0px;">Add new Supplier</a>
             </div>
         </div>
     </div>
@@ -58,7 +58,6 @@
       <tr>
         <th scope="col">Supplier Name</th>
         <th scope="col">Phone Number</th>
-        <th scope="col">County</th>
         <th scope="col">Action</th>
       </tr>
       </thead>
@@ -66,7 +65,6 @@
       <tr th:each="supplier, iter:${suppliers}">
         <td th:text="${supplier.supplierName}"></td>
         <td th:text="${supplier.phoneNumber}"></td>
-        <td th:text="${supplier.county}"></td>
         <td>
           <a class="btn btn-outline-info" th:href="@{/supplierManagement/edit/{id}(id=${supplier.id})}"><i class="bi bi-pencil-fill"></i></a>
           <a class="btn btn-outline-danger" th:href="@{/supplierManagement/delete/{id}(id=${supplier.id})}"><i class="bi bi-trash"></i></a>
