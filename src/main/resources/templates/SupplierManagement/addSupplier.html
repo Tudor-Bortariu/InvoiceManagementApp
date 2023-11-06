@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>Add Supplier Form</title>
@@ -19,10 +19,10 @@
 
             <div class="topnavDark">
                 <a class="navbar-brand">Menu</a>
-                <a class="nav-item nav-link" th:href="@{/}">To Home Page</a>
-                <a class="nav-item nav-link" th:href="@{/invoiceManagement}">My Invoices</a>
-                <a class="nav-item nav-link" th:href="@{/supplierManagement}">My Suppliers</a>
-                <a class="nav-item nav-link" th:href="@{/logoutConfirm}" sec:authorize="isAuthenticated()">Logout</a>
+                <a class="nav-item nav-link" th:href="@{/home}">To Home Page</a>
+                <a class="nav-item nav-link" th:href="@{/invoice-management}">My Invoices</a>
+                <a class="nav-item nav-link" th:href="@{/supplier-management}">My Suppliers</a>
+                <a class="nav-item nav-link" th:href="@{/logout-confirmation}" sec:authorize="isAuthenticated()">Logout</a>
             </div>
 
         </div>
@@ -32,7 +32,7 @@
 <h1 align="center">Add New Supplier</h1>
 
 <div class="container">
-<form method="post" th:action="@{addSupplier}">
+<form method="post" th:action="@{/supplier-management}">
     <div class="row">
         <div class="col">
             <label for="supplierName">Supplier Name: </label>
@@ -41,10 +41,6 @@
         <div class="col">
             <label for="phoneNumber">Supplier Phone Number: </label>
             <input type="text" class="form-control" name="phoneNumber" id="phoneNumber" required maxlength="10" minlength="10" placeholder="Phone Number">
-        </div>
-        <div class="col">
-            <label for="county">County: </label>
-            <input type="text" class="form-control" name="county" id="county" required placeholder="County">
         </div>
         </div>
         <br>

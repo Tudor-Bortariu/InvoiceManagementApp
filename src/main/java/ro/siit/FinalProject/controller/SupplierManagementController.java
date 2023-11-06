@@ -1,92 +1,69 @@
 package ro.siit.FinalProject.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.view.RedirectView;
-import ro.siit.FinalProject.api.SupplierApi;
-import ro.siit.FinalProject.exception.ObjectNotFoundException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 import ro.siit.FinalProject.model.Supplier;
-import ro.siit.FinalProject.repository.JpaSupplierRepository;
-import ro.siit.FinalProject.service.InvoiceServiceImpl;
-import ro.siit.FinalProject.service.SecurityServiceImpl;
+import ro.siit.FinalProject.service.SupplierService;
 
-import java.util.Optional;
 import java.util.UUID;
 
-@Controller
-public class SupplierManagementController implements SupplierApi {
+@RestController
+@RequestMapping("/supplier-management")
+@RequiredArgsConstructor
+public class SupplierManagementController {
+    private final SupplierService supplierService;
 
-    @Autowired
-    private SecurityServiceImpl securityService;
-
-    @Autowired
-    private JpaSupplierRepository supplierRepository;
-
-    @Autowired
-    private InvoiceServiceImpl invoiceService;
-
-    @Override
-    public String supplierManagement(Model model) {
-        model.addAttribute("suppliers", supplierRepository.findAllSuppliersByUser(securityService.getUser()));
-
-        return "SupplierManagement/supplierManagement";
+    @GetMapping
+    public ModelAndView supplierManagementView() {
+        ModelAndView modelAndView = new ModelAndView("SupplierManagement/supplierManagement");
+        modelAndView.addObject("suppliers", supplierService.findByUser_OrderBySupplierNameAsc());
+        return modelAndView;
     }
 
-    @Override
-    public String addSupplierForm(Model model) {
-        return "SupplierManagement/addSupplier";
+    @GetMapping("/form")
+    public ModelAndView getAddSupplierForm() {
+        return new ModelAndView("SupplierManagement/addSupplier");
     }
 
-    @Override
-    public RedirectView addSupplier(Model model,
-                                    @RequestParam String supplierName,
-                                    @RequestParam String phoneNumber,
-                                    @RequestParam String county) {
-
-        invoiceService.checkIfSupplierExistsForUser(supplierName);
-
-        Supplier addedSupplier = new Supplier();
-
-        addedSupplier.setSupplierName(supplierName);
-        addedSupplier.setPhoneNumber(phoneNumber);
-
-        addedSupplier.setUser(securityService.getUser());
-
-        supplierRepository.saveAndFlush(addedSupplier);
-
-        return new RedirectView("/supplierManagement");
+    @PostMapping
+    public ResponseEntity<Supplier> addSupplier(@RequestParam String supplierName,
+                                                @RequestParam String phoneNumber) {
+        return new ResponseEntity<>(supplierService.createSupplier(supplierName, phoneNumber), HttpStatus.CREATED);
     }
 
-    @Override
-    public RedirectView deleteSupplier(Model model, @PathVariable UUID id) {
-        supplierRepository.deleteBySupplierId(id);
-        return new RedirectView("/supplierManagement");
+    @DeleteMapping("/{supplierId}")
+    public ResponseEntity<String> deleteSupplier(@PathVariable UUID supplierId) {
+        supplierService.deleteById(supplierId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @Override
-    public String editSupplierForm(Model model, @PathVariable UUID id) {
-        Optional<Supplier> supplier = supplierRepository.findById(id);
-        model.addAttribute("supplier", supplier.orElseThrow(ObjectNotFoundException::new));
-
-        return "SupplierManagement/editForm";
+    @GetMapping("/{supplierId}/form")
+    public ModelAndView getEditSupplierForm(@PathVariable UUID supplierId) {
+        ModelAndView modelAndView = new ModelAndView("SupplierManagement/editForm");
+        modelAndView.addObject("supplier", supplierService.findById(supplierId));
+        return modelAndView;
     }
 
-    @Override
-    public RedirectView editInvoice(Model model,
-                                    @RequestParam UUID supplierId,
-                                    @RequestParam String updatedSupplierName,
-                                    @RequestParam String updatedPhoneNumber,
-                                    @RequestParam String updatedCounty) {
+    @PutMapping("/{supplierId}")
+    public ResponseEntity<Supplier> editSupplier(@PathVariable UUID supplierId,
+                                     @RequestParam String updatedSupplierName,
+                                     @RequestParam String updatedPhoneNumber,
+                                     @RequestParam String updatedCounty) {
 
-        Supplier supplier = supplierRepository.findById(supplierId).orElseThrow(ObjectNotFoundException::new);
-
+        Supplier supplier = supplierService.findById(supplierId);
         supplier.setSupplierName(updatedSupplierName);
         supplier.setPhoneNumber(updatedPhoneNumber);
 
-        supplierRepository.saveAndFlush(supplier);
-
-        return new RedirectView("/supplierManagement");
+        return new ResponseEntity<>(supplierService.saveSupplier(supplier), HttpStatus.OK);
     }
 }

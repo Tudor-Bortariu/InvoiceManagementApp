@@ -5,18 +5,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ro.siit.FinalProject.model.Invoice;
-import ro.siit.FinalProject.model.Supplier;
-import ro.siit.FinalProject.service.InvoiceServiceImpl;
+import ro.siit.FinalProject.service.InvoiceService;
 
-import java.time.LocalDate;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
-class InvoiceServiceImplTest {
+class InvoiceServiceTest {
     @Autowired
-    private InvoiceServiceImpl invoiceService;
+    private InvoiceService invoiceService;
 
     Invoice invoice = new Invoice();
 

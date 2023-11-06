@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/html">
+<html lang="en" xmlns="http://www.w3.org/1999/html" xmlns:th="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>Add Invoice Form</title>
@@ -19,10 +20,10 @@
 
             <div class="topnavDark">
                 <a class="navbar-brand">Menu</a>
-                <a class="nav-item nav-link" th:href="@{/}">To Home Page</a>
-                <a class="nav-item nav-link" th:href="@{/invoiceManagement}">My Invoices</a>
-                <a class="nav-item nav-link" th:href="@{/supplierManagement}">My Suppliers</a>
-                <a class="nav-item nav-link" th:href="@{/logoutConfirm}" sec:authorize="isAuthenticated()">Logout</a>
+                <a class="nav-item nav-link" th:href="@{/home}">To Home Page</a>
+                <a class="nav-item nav-link" th:href="@{/invoice-management}">My Invoices</a>
+                <a class="nav-item nav-link" th:href="@{/supplier-management}">My Suppliers</a>
+                <a class="nav-item nav-link" th:href="@{/logout-confirmation}" sec:authorize="isAuthenticated()">Logout</a>
             </div>
 
         </div>
@@ -32,7 +33,7 @@
 <h1 align="center">Add invoice</h1>
 
 <div class="container">
-<form method="post" th:action="@{addInvoice}" enctype="multipart/form-data">
+<form method="post" th:action="@{/invoice-management}" enctype="multipart/form-data">
     <div class="row">
         <div class="col">
             <input type="text" class="form-control" name="invoiceNumber" id="invoiceNumber" required placeholder="Invoice Number">
@@ -44,7 +45,7 @@
                 </select>
             </div>
             <div class="col">
-                <a class="btn btn-primary" th:href="@{/supplierManagement/addSupplier}">or Add New Supplier</a>
+                <a class="btn btn-primary" th:href="@{/supplier-management/form}">or Add New Supplier</a>
             </div>
         <div class="row">
             <div class="col">

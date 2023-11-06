@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>Home Page</title>
@@ -19,11 +19,11 @@
 
             <div class="topnavDark">
                 <a class="navbar-brand">Menu</a>
-                <a th:href="@{/invoiceManagement}">Manage your Invoices</a>
-                <a th:href="@{/supplierManagement}" sec:authorize="isAuthenticated()">My Suppliers</a>
+                <a th:href="@{/invoice-management}">Manage your Invoices</a>
+                <a th:href="@{/supplier-management}" sec:authorize="isAuthenticated()">My Suppliers</a>
                 <a th:href="@{/login}" sec:authorize="!isAuthenticated()">Login</a>
-                <a th:href="@{/logoutConfirm}" sec:authorize="isAuthenticated()">Logout</a>
-                <a th:href="@{/register}" sec:authorize="!isAuthenticated()">Register</a>
+                <a th:href="@{/logout-confirmation}" sec:authorize="isAuthenticated()">Logout</a>
+                <a th:href="@{/register/form}" sec:authorize="!isAuthenticated()">Register</a>
             </div>
 
         </div>
@@ -35,17 +35,17 @@
             <hr/>
         </div>
 
-    <div class="container">
-        <p id="greetingMessage" sec:authorize="isAuthenticated()" th:text="'Welcome, ' + ${userFirstName} + '!'"></p>
+    <div class="container" sec:authorize="isAuthenticated()">
+        <p id="greetingMessage" th:text="'Welcome, ' + ${userFirstName} + '!'"></p>
     </div>
-
     <div class="container" align="center" sec:authorize="isAnonymous()">
-        <a th:href="@{/register}" class="btn btn-primary btn-lg btn-block" id="registerButton" style="background-color: #04AA6D;">
+        <a th:href="@{/register/form}" class="btn btn-primary btn-lg btn-block" id="registerButton" style="background-color: #04AA6D;">
             Register and start tracking your invoices with ease.
         </a>
     </div>
+
     <div class="container" align="center" sec:authorize="isAuthenticated()">
-        <a th:href="@{/invoiceManagement}" class="btn btn-primary btn-lg btn-block" id="manageInvoicePage" style="background-color: #04AA6D;">
+        <a th:href="@{/invoice-management}" class="btn btn-primary btn-lg btn-block" id="manageInvoicePage" style="background-color: #04AA6D;">
             Manage your Invoices
         </a>
     </div>

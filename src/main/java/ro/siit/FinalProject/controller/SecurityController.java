@@ -1,63 +1,41 @@
 package ro.siit.FinalProject.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import ro.siit.FinalProject.api.SecurityApi;
-import ro.siit.FinalProject.config.SecurityConfig;
-import ro.siit.FinalProject.model.User;
-import ro.siit.FinalProject.repository.UserRepository;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
+import ro.siit.FinalProject.service.UserService;
 
-import java.util.UUID;
+@RestController
+@RequestMapping("")
+@RequiredArgsConstructor
+public class SecurityController{
+    private final UserService userService;
 
-@Controller
-public class SecurityController implements SecurityApi {
-
-    @Autowired
-    private SecurityConfig securityConfig;
-    @Autowired
-    private UserRepository userRepository;
-
-    @Override
-    public String invoiceManagement(Model model) {
-
-        return "Security/register";
+    @GetMapping("/register/form")
+    public ModelAndView getRegisterForm() {
+        return new ModelAndView("Security/register");
     }
 
-    @Override
-    public String sendRegistrationForm (Model model,
-                                        @RequestParam String username,
-                                        @RequestParam("initialPassword") String initialPassword,
-                                        @RequestParam("passwordCheck") String passwordCheck,
-                                        @RequestParam String firstName,
-                                        @RequestParam String lastName,
-                                        @RequestParam String email){
+    @PostMapping("/register")
+    public ResponseEntity<String> registerUser(@RequestParam String username,
+                                               @RequestParam("initialPassword") String initialPassword,
+                                               @RequestParam("passwordCheck") String passwordCheck,
+                                               @RequestParam String firstName,
+                                               @RequestParam String lastName,
+                                               @RequestParam String email){
 
-        if(userRepository.findByUsername(username).isPresent()) {
-            throw new IllegalArgumentException("Username is not available. Please insert a different Username.");
-        } else {
-            if(!initialPassword.equals(passwordCheck)){
-                throw new IllegalArgumentException("Passwords are not matching. Please make sure you complete the passwords correctly.");
-            }
-
-            User user = new User();
-            user.setId(UUID.randomUUID());
-            user.setUsername(username);
-            user.setFirstName(firstName);
-            user.setLastName(lastName);
-            user.setPassword(securityConfig.passwordEncoder().encode(passwordCheck));
-            user.setEmail(email);
-
-            userRepository.saveAndFlush(user);
-        }
-
-        return "HomePage/home";
+        userService.saveUser(username, initialPassword, passwordCheck, firstName, lastName, email);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @Override
-    public String logoutConfirmation (Model model){
-
-        return "Security/logoutConfirmation";
+    @GetMapping("/logout-confirmation")
+    public ModelAndView logoutConfirmationView(){
+        return new ModelAndView("Security/logoutConfirmation");
     }
 }

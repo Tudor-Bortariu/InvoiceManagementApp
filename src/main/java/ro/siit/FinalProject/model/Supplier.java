@@ -28,7 +28,7 @@ public class Supplier {
     @Column(nullable = false, name = "supplier_name")
     private String supplierName;
 
-    @Column(name = "phone_number")
+    @Column(name = "phone_number", unique = true)
     private String phoneNumber;
 
     @ManyToOne
