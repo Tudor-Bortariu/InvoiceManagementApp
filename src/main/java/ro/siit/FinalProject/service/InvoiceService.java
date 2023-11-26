@@ -17,13 +17,20 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
+import ro.siit.FinalProject.exception.ObjectNotFoundException;
+import ro.siit.FinalProject.mapstruct.dto.invoice.CreateInvoiceDto;
+import ro.siit.FinalProject.mapstruct.dto.invoice.UpdateInvoiceDto;
+import ro.siit.FinalProject.mapstruct.mapper.invoice.InvoiceMapper;
+import ro.siit.FinalProject.mapstruct.response.invoice.InvoiceResponse;
 import ro.siit.FinalProject.model.Invoice;
+import ro.siit.FinalProject.model.Supplier;
 import ro.siit.FinalProject.model.User;
 import ro.siit.FinalProject.repository.InvoiceRepository;
 import ro.siit.FinalProject.repository.SupplierRepository;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -33,38 +40,108 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class InvoiceService {
     private final InvoiceRepository invoiceRepository;
+    private final InvoiceMapper mapper;
     private final SecurityService securityService;
     private final SupplierRepository supplierRepository;
 
-    public List<String> getRemainedInvoiceStatusOptions(Invoice invoice) {
+    public List<String> getRemainedInvoiceStatusOptions(String invoiceStatus) {
         return Stream.of("Paid", "Not paid")
-                .filter(status -> !status.equals(invoice.getStatus()))
+                .filter(status -> !status.equals(invoiceStatus))
                 .collect(Collectors.toList());
     }
 
-    public List<Invoice> findByUser_OrderByIntroductionDateDesc(User user){
-        return invoiceRepository.findByUser_OrderByIntroductionDateDesc(user);
+    public InvoiceResponse findById(Integer id){
+        Invoice invoice = invoiceRepository.findById(id).orElseThrow(ObjectNotFoundException::new);
+        return mapper.invoiceToInvoiceResponse(invoice);
+    }
+
+    public List<InvoiceResponse> findByUser_OrderByIntroductionDateDesc(){
+        return invoiceRepository
+                .findByUser_OrderByIntroductionDateDesc(securityService.getAuthenticatedUser())
+                .stream()
+                .map(mapper::invoiceToInvoiceResponse)
+                .collect(Collectors.toList());
     }
 
     @Transactional
-    public Invoice saveInvoice(Invoice invoice){
-        return invoiceRepository.saveAndFlush(invoice);
-    }
-
-    public Invoice findByInvoiceNumber_AndUser(String invoiceNumber, User user){
-        Optional<Invoice> invoice = invoiceRepository.findByInvoiceNumber_AndUser(invoiceNumber, user);
-        return invoice.orElse(null);
+    public InvoiceResponse createInvoice(CreateInvoiceDto createInvoiceDto) throws IOException {
+        checkInvoiceNumberExists(createInvoiceDto.getInvoiceNumber());
+        Invoice invoice = mapper.createInvoiceDtoToInvoice(createInvoiceDto);
+        User user = securityService.getAuthenticatedUser();
+        Supplier supplier = supplierRepository.findByUser_AndSupplierName(user, createInvoiceDto.getSupplier())
+                .orElseThrow(ObjectNotFoundException::new);
+        invoice.setUser(user);
+        invoice.setSupplier(supplier);
+        if(createInvoiceDto.getInvoiceImage() != null){
+            System.out.println(createInvoiceDto.getInvoiceImage());
+            invoice.setInvoiceImage(createInvoiceDto.getInvoiceImage().getBytes());
+        }
+        System.out.println(Arrays.toString(invoice.getInvoiceImage()));
+        invoiceRepository.saveAndFlush(invoice);
+        return mapper.invoiceToInvoiceResponse(invoice);
     }
 
     @Transactional
-    public void deleteByInvoiceNumber(String invoiceNumber){
-        invoiceRepository.deleteByInvoiceNumber(invoiceNumber);
+    public InvoiceResponse updateInvoice(Integer invoiceId, UpdateInvoiceDto updateInvoiceDto){
+        Invoice invoice = invoiceRepository.getReferenceById(invoiceId);
+        Supplier updatedSupplier = supplierRepository.findByUser_AndSupplierName(securityService.getAuthenticatedUser(), updateInvoiceDto.getSupplier())
+                .orElseThrow(ObjectNotFoundException::new);
+        Invoice updatedInvoice = mapper.updateInvoiceDtoToInvoice(invoice, updateInvoiceDto);
+        invoice.setSupplier(updatedSupplier);
+        return mapper.invoiceToInvoiceResponse(invoiceRepository.saveAndFlush(updatedInvoice));
     }
 
-    public List<String> getRemainedInvoiceCurrencyOptions(Invoice invoice) {
+    @Transactional
+    public InvoiceResponse changePaymentStatus(String invoiceNumber){
+        Invoice invoice = invoiceRepository.findByInvoiceNumber_AndUser(invoiceNumber, securityService.getAuthenticatedUser())
+                .orElseThrow(ObjectNotFoundException::new);
+        if(invoice.getStatus().equals("Not paid")) {
+            invoice.setStatus("Paid");
+        } else {
+            invoice.setStatus("Not paid");
+        }
+        return mapper.invoiceToInvoiceResponse(invoiceRepository.saveAndFlush(invoice));
+    }
+
+    private void checkInvoiceNumberExists(String invoiceNumber) {
+        Optional<Invoice> invoice = invoiceRepository.findByInvoiceNumber_AndUser(invoiceNumber, securityService.getAuthenticatedUser());
+        if (invoice.isPresent()) {
+            throw new IllegalArgumentException("Invoice number already exists in this database. Please insert a different number for the Invoice.");
+        }
+    }
+
+    public InvoiceResponse findByInvoiceNumber_AndUser(String invoiceNumber){
+        Invoice invoice = invoiceRepository
+                .findByInvoiceNumber_AndUser(invoiceNumber, securityService.getAuthenticatedUser())
+                .orElseThrow(ObjectNotFoundException::new);
+        return mapper.invoiceToInvoiceResponse(invoice);
+    }
+
+    @Transactional
+    public void deleteById(Integer invoiceId){
+        invoiceRepository.deleteById(invoiceId);
+    }
+
+    public List<String> getRemainedInvoiceCurrencyOptions(String currency) {
         return Stream.of("RON", "EUR", "USD")
-                .filter(status -> !status.equals(invoice.getCurrency()))
+                .filter(status -> !status.equals(currency))
                 .collect(Collectors.toList());
+    }
+
+    public byte[] getInvoiceImage(String invoiceNumber){
+        Invoice invoice = invoiceRepository.findByInvoiceNumber_AndUser(invoiceNumber, securityService.getAuthenticatedUser())
+                .orElseThrow(ObjectNotFoundException::new);
+        if(invoice.getInvoiceImage() != null) {
+            return invoice.getInvoiceImage();
+        }
+        throw new NullPointerException("Selected Invoice does not have a picture assigned.");
+    }
+
+    @Transactional
+    public void deleteResourceForInvoice(Integer invoiceId){
+        Invoice invoice = invoiceRepository.getReferenceById(invoiceId);
+        invoice.setInvoiceImage(null);
+        invoiceRepository.saveAndFlush(invoice);
     }
 
     public void getInvoiceListWithCustomInputFilter(String filterParam, ModelAndView modelAndView) {
@@ -88,14 +165,6 @@ public class InvoiceService {
                     LocalDate.now().plusDays(Integer.parseInt(filter)), "Not paid");
         } else {
             return invoiceRepository.findByUser_OrderByIntroductionDateDesc(securityService.getAuthenticatedUser());
-        }
-    }
-
-    public void checkIfSupplierExistsForUser(String supplierName){
-        User user = securityService.getAuthenticatedUser();
-
-        if(supplierRepository.findByUser_AndSupplierName(user, supplierName.toUpperCase()).isPresent()){
-            throw new IllegalArgumentException("Supplier name already exists. Please insert a different name for the Supplier.");
         }
     }
 
