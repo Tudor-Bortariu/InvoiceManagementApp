@@ -5,21 +5,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
-import ro.siit.FinalProject.service.SecurityService;
+import ro.siit.FinalProject.service.UserService;
 
 @RestController
 @RequestMapping("/home")
 @RequiredArgsConstructor
 public class HomeController{
-    private final SecurityService securityService;
+    private final UserService userService;
 
     @GetMapping
-    public ModelAndView homePage() {
+    public ModelAndView homePageView() {
         ModelAndView modelAndView = new ModelAndView("HomePage/home");
-        //TODO (TUDOR): Insert Short User DTO for FE info on homepage
-        if(securityService.isAuthenticated()) {
-            modelAndView.addObject("userFirstName", securityService.getAuthenticatedUser().getFirstName());
-        }
+        modelAndView.addObject("user", userService.findAuthenticatedUser());
         return modelAndView;
     }
 }

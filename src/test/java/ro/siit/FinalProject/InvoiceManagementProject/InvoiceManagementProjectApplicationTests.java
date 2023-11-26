@@ -9,8 +9,6 @@ import ro.siit.FinalProject.controller.InvoiceManagementController;
 import ro.siit.FinalProject.controller.SecurityController;
 import ro.siit.FinalProject.controller.SupplierManagementController;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-
 @SpringBootTest
 class InvoiceManagementProjectApplicationTests {
 

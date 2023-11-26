@@ -1,15 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>Edit Invoice</title>
-    <!-- CSS only -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
-    <!-- JavaScript Bundle with Popper -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    <link rel="stylesheet" th:href="@{/CssStyle/cssStyle.css}">
 </head>
 <body>
 
@@ -19,10 +12,10 @@
 
             <div class="topnavDark">
                 <a class="navbar-brand">Menu</a>
-                <a th:href="@{/}">To Home Page</a>
-                <a th:href="@{/invoiceManagement}">My Invoices</a>
-                <a th:href="@{/supplierManagement}">My Suppliers</a>
-                <a th:href="@{/logoutConfirm}" sec:authorize="isAuthenticated()">Logout</a>
+                <a th:href="@{/home}">To Home Page</a>
+                <a th:href="@{/invoice-management}">My Invoices</a>
+                <a th:href="@{/supplier-management}">My Suppliers</a>
+                <a th:href="@{/logout-confirmation}" sec:authorize="isAuthenticated()">Logout</a>
             </div>
 
         </div>
@@ -32,15 +25,15 @@
     <h1 th:text="'Edit invoice ' + ${invoice.invoiceNumber}"></h1>
 
     <div class="container">
-        <form method="post" th:action="@{/invoiceManagement/edit}" enctype="multipart/form-data">
+        <form id="updateInvoiceForm" name="updateInvoiceForm" enctype="multipart/form-data">
             <div class="row">
             <div class="col">
                 <label for="invoiceNumber" class="form-label">Invoice Number</label>
-                <input th:value="${invoice.invoiceNumber}" type="text" class="form-control" id="invoiceNumber" aria-describedby="number" name="invoiceNumber" readonly>
+                <input th:value="${invoice.invoiceNumber}" type="text" class="form-control" id="invoiceNumber" name="invoiceNumber" readonly>
             </div>
             <div class="col">
                 <label for="updatedSupplier">Update Supplier Name</label>
-                <select name="updatedSupplierName" required class="form-control" id="updatedSupplier">
+                <select name="updatedSupplier" required class="form-control" id="updatedSupplier">
                     <option th:value="${invoice.supplier.supplierName}" th:text="${invoice.supplier.supplierName}"></option>
                     <option th:each="supplier : ${supplierList}" th:value="${supplier.supplierName}" th:text="${supplier.supplierName}"></option>
                 </select>
@@ -53,7 +46,7 @@
                 </div>
                 <div class="col">
                     <label for="currency" class="form-label">Modify Invoice Currency </label>
-                    <select name="updatedCurrency" id="currency" class="form-control" aria-describedby="currency" required>
+                    <select name="currency" id="currency" class="form-control" aria-describedby="currency" required>
                         <option th:value="${invoice.currency}" th:text="${invoice.currency}"></option>
                         <option th:each="currency : ${currencyList}" th:value="${currency}" th:text="${currency}"></option>
                     </select>
@@ -62,11 +55,12 @@
             <div class="row">
                 <div class="col">
                     <label for="dueDate" class="form-label">Modify Due Date</label>
-                    <input th:value="${invoice.dueDate}" type="date" class="form-control" name="updatedDueDate" id="dueDate" th:min="${minDate}" th:max="${maxDate}" required>
+                    <input th:value="${invoice.dueDate}" type="date" class="form-control" name="dueDate" id="dueDate" th:min="${minDate}"
+                           th:max="${maxDate}" required>
                 </div>
             <div class="col">
                 <label for="paymentStatus" class="form-label">Modify Payment Status</label>
-                <select name="updatedStatus" id="paymentStatus" class="form-control" aria-describedby="paymentStatus" required>
+                <select name="paymentStatus" id="paymentStatus" class="form-control" aria-describedby="paymentStatus" required>
                     <option th:value="${invoice.status}" th:text="${invoice.status}"></option>
                     <option th:each="status : ${availableStatus}" th:value="${status}" th:text="${status}"></option>
                 </select>
@@ -83,6 +77,18 @@
             </div>
         </form>
     </div>
-</div>
+
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script th:src="@{/JavaScript/updateScript.js}"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<link rel="stylesheet" th:href="@{/CssStyle/cssStyle.css}">
 </body>
 </html>

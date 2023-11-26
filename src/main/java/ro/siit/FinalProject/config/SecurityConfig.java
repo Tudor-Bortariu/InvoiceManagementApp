@@ -41,7 +41,7 @@ public class SecurityConfig {
         http
                 .authenticationProvider(authenticationProvider())
                 .authorizeHttpRequests(authorize -> authorize
-                                .requestMatchers("/invoice-management/**", "/addInvoice/**", "/supplier-management/**").authenticated()
+                                .requestMatchers("/invoice-management/**", "/supplier-management/**").authenticated()
                                 .anyRequest().permitAll())
                 .formLogin(formLogin -> formLogin
                         .usernameParameter("username")
@@ -50,7 +50,7 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutSuccessUrl("/home")
                         .permitAll())
-                .csrf(Customizer.withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(Customizer.withDefaults());
         return http.build();
     }

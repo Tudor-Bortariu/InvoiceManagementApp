@@ -12,8 +12,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 @Repository
-public interface InvoiceRepository extends JpaRepository<Invoice, String> {
+public interface InvoiceRepository extends JpaRepository<Invoice, Integer> {
     List<Invoice> findByUser_OrderByIntroductionDateDesc(User user);
+
     @Transactional
     @Modifying
     void deleteByInvoiceNumber(String invoiceNumber);
